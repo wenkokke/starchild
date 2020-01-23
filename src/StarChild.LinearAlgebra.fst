@@ -1,67 +1,80 @@
 module StarChild.LinearAlgebra
 
-open FStar.List
+include FStar.List.Tot
 open FStar.Real
 
-let vector a n = l:list a {length l == n}
-let matrix a r c = vector (vector a c) r
+type vector 'a n   = v:list 'a {length v == n}
+type matrix 'a r c = vector (vector 'a c) r
 
-val dot : #n:nat -> vector real n -> vector real n -> Tot real
-let rec dot #n xs ys =
-  match xs, ys with
-  | [], [] -> 0.0R
-  | (x :: xs) , (y :: ys) -> x *. y +. dot #(n - 1) xs ys
-
-val scale : #n:nat -> real -> vector real n -> Tot (vector real n)
-let scale #n x ys = mapT (fun y -> x *. y) ys
-
-val add : #n:nat -> real -> vector real n -> Tot (vector real n)
-let add #n x ys = mapT (fun y -> x +. y) ys
-
-val vadd : #n:nat -> vector real n -> vector real n -> Tot (vector real n)
-let rec vadd #n xs ys =
-  match xs, ys with
+val map2 : #a:Type -> #b:Type -> #c:Type -> #n:nat -> f:(a -> b -> Tot c) -> xs:vector a n -> ys:vector b n -> Tot (vector c n)
+let rec map2 #a #b #c #n f xs ys = match xs, ys with
   | [], [] -> []
-  | (x :: xs), (y :: ys) -> (x +. y) :: vadd #(n - 1) xs ys
+  | (x :: xs), (y :: ys) -> f x y :: map2 #a #b #c #(n - 1) f xs ys
 
-val replicate : n:nat -> real -> Tot (vector real n)
-let rec replicate n x =
-  match n with
+val sum : #n:nat -> xs:vector real n -> real
+let sum #n xs = fold_right (fun x y -> x +. y) xs 0.0R
+
+val dot : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real
+let dot #n xs ys = sum (map2 (fun x y -> x *. y) xs ys)
+
+val ( <.> ) : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real
+let ( <.> ) = dot
+
+val sAv : #n:nat -> x:real -> ys:vector real n -> Tot (vector real n)
+let sAv #n x ys = map (fun y -> x +. y) ys
+
+val ( +> ) : #n:nat -> x:real -> ys:vector real n -> Tot (vector real n)
+let ( +> ) = sAv
+
+val vAv : #n:nat -> xs:vector real n -> ys:vector real n -> Tot (vector real n)
+let vAv #n xs ys = map2 (fun x y -> x +. y) xs ys
+
+val ( <+> ) : #n:nat -> xs:vector real n -> ys:vector real n -> Tot (vector real n)
+let ( <+> ) = vAv
+
+val scale : #n:nat -> x:real -> ys:vector real n -> Tot (vector real n)
+let scale #n x ys = map (fun y -> x *. y) ys
+
+val to_vec : #a:Type -> x:a -> Tot (vector a 1)
+let to_vec #a x = [x]
+
+val from_vec : #a:Type -> xs:vector a 1 -> a
+let from_vec #a xs = match xs with
+  | (x :: []) -> x
+
+val to_row : #a:Type -> #c:nat -> vector a c -> Tot (matrix a 1 c)
+let to_row #a #c xs = to_vec xs
+
+val from_row : #a:Type -> #c:nat -> matrix a 1 c -> vector a c
+let from_row #a #c xss =  from_vec xss
+
+val to_col : #a:Type -> #r:nat -> vector a r -> Tot (matrix a r 1)
+let to_col #a #r xs = map to_vec xs
+
+val from_col : #a:Type -> #r:nat -> matrix a r 1 -> vector a r
+let from_col #a #r xss = map (from_vec #a) xss
+
+val replicate : #a:Type -> #n:nat -> x:a -> Tot (vector a n)
+let rec replicate #a #n x = match n with
   | 0 -> []
-  | n -> x :: replicate (n - 1) x
+  | n -> x :: replicate #a #(n - 1) x
 
-val as_row : #c:nat -> vector real c -> Tot (matrix real 1 c)
-let as_row #c xs = [xs]
+val vXm : #r:nat -> #c:nat -> xs:vector real r -> yss:matrix real r c -> Tot (vector real c)
+let rec vXm #r #c xs yss = match xs, yss with
+  | [], [] -> replicate 0.0R
+  | (x :: xs), (ys :: yss) -> vAv #c (scale #c x ys) (vXm #(r - 1) #c xs yss)
 
-val as_col : #r:nat -> vector real r -> Tot (matrix real r 1)
-let as_col #r xs = mapT (fun x -> [x]) xs
-
-val vXm : #r:nat -> #c:nat -> vector real r -> matrix real r c -> Tot (vector real c)
-let rec vXm #r #c xs yss =
- match xs, yss with
- | [], [] -> replicate c 0.0R
- | (x :: xs), (ys :: yss) -> vadd (scale x ys) (vXm #(r - 1) #c xs yss)
+val ( *> ) : #r:nat -> #c:nat -> xs:vector real r -> yss:matrix real r c -> Tot (vector real c)
+let ( *> ) = vXm
 
 val mXm : #i:nat -> #j:nat -> #k:nat -> matrix real i j -> matrix real j k -> Tot (matrix real i k)
-let rec mXm #i #j #k xss yss =
-  match xss with
-  | [] -> []
-  | (xs :: xss) -> vXm #j #k xs yss :: mXm #(i - 1) #j #k xss yss
+let mXm #i #j #k xss yss = map (fun xs -> vXm #j #k xs yss) xss
 
-val mXv : #r:nat -> #c:nat -> matrix real r c -> vector real c -> Tot (vector real r)
-let mXv #r #c xss ys = mXm #r #c #1 xss (as_col ys)
+val ( <*> ) : #i:nat -> #j:nat -> #k:nat -> matrix real i j -> matrix real j k -> Tot (matrix real i k)
+let ( <*> ) = mXm
 
-noeq type fully_connected r c = { bias: real; weights: matrix real r c }
+val mXv : #r:nat -> #c:nat -> xss:matrix real r c -> ys:vector real c -> Tot (vector real r)
+let mXv #r #c xss ys = from_col (mXm xss (to_col #real #c ys))
 
-val run_forwards : #r:nat -> #c:nat -> fully_connected r c -> vector real c -> Tot (vector real r)
-let run_forwards #r #c l xs = add l.bias (mXv l.weights xs)
-
-val predict : #r:nat -> #c:nat -> fully_connected r c -> vector real c -> Tot (vector bool r)
-let predict #r #c l xs = mapT (fun y -> y >=. 0.0R) (run_forwards l xs)
-
-val example1 : fully_connected 1 2
-let example1 = { bias = 0.184R; weights = [[0.194R; 0.195R]] }
-
-let test1 = assert ((predict example1 [1.0R; 1.0R]) == [true])
-let test2 = assert ((predict example1 [1.0R; 1.0R]) == [false])
-let test3 = assert (forall x1 x2. (x1 >=. 0.0R /\ x2 >=. 0.0R) ==> ((predict example1 [x1; x2]) == [true]))
+val ( <* ) : #r:nat -> #c:nat -> xss:matrix real r c -> ys:vector real c -> Tot (vector real r)
+let ( <* ) = mXv
