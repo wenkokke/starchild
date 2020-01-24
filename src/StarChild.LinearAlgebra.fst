@@ -1,7 +1,9 @@
 module StarChild.LinearAlgebra
 
 include FStar.List.Tot
+
 open FStar.Real
+open FStar.Mul
 
 type vector 'a n   = v:list 'a {length v == n}
 type matrix 'a r c = vector (vector 'a c) r
