@@ -5,13 +5,31 @@ include FStar.List.Tot
 open FStar.Real
 open FStar.Mul
 
-type vector 'a n   = v:list 'a {length v == n}
+type real_pos = x:real {x >. 0.0R}
+type vector 'a n = v:list 'a {length v == n}
 type matrix 'a r c = vector (vector 'a c) r
+
+val all : #a:Type -> #n:nat -> p:(a -> bool) -> xs:vector a n -> Tot bool
+let all #a #n p xs = fold_right (fun x y -> p x && y) xs true
+
+val map1 : #a:Type -> #b:Type -> #n:nat -> f:(a -> Tot b) -> xs:vector a n -> Tot (vector b n)
+let rec map1 #a #b #n f xs = match xs with
+  | [] -> []
+  | (x :: xs) -> f x :: map1 #a #b #(n - 1) f xs
 
 val map2 : #a:Type -> #b:Type -> #c:Type -> #n:nat -> f:(a -> b -> Tot c) -> xs:vector a n -> ys:vector b n -> Tot (vector c n)
 let rec map2 #a #b #c #n f xs ys = match xs, ys with
   | [], [] -> []
   | (x :: xs), (y :: ys) -> f x y :: map2 #a #b #c #(n - 1) f xs ys
+
+val sum_pos_or : #n:nat -> x:real_pos -> xs:vector real_pos n -> real_pos
+let rec sum_pos_or #n x xs = match xs with
+  | [] -> x
+  | (y :: ys) -> x +. sum_pos_or #(n - 1) y ys
+
+val sum_pos : #n:pos -> xs:vector real_pos n -> real_pos
+let sum_pos #n xs = match xs with
+  | (y :: ys) -> sum_pos_or #(n - 1) y ys
 
 val sum : #n:nat -> xs:vector real n -> real
 let sum #n xs = fold_right (fun x y -> x +. y) xs 0.0R
