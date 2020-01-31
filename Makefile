@@ -1,6 +1,6 @@
 FSTAR=fstar.exe
 
-check:
-	$(FSTAR) src/*.fst
+test:
+	$(FSTAR) --include src src/*.fst test/*.fst
 
-.phony: check
+.PHONY: test
