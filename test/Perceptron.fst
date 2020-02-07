@@ -5,7 +5,7 @@ open StarChild.LinearAlgebra
 open StarChild.Network
 
 val layer1 : layer 2 1
-let layer1 = { bias       = 0.184R
+let layer1 = { biases     = [0.184R]
              ; weights    = [[0.194R]; [0.195R]]
              ; activation = Sigmoid
              }

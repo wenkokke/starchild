@@ -26,7 +26,7 @@ let negate x = 0.0R -. x
 val lexp : real -> Tot real_pos
 let lexp x = if x <=. negate 1.0R then 0.00001R
         else if x >=. 1.0R        then 5.898R *. x -. 3.898R
-        else                           x +. 1.0R
+        else (* 1.0R <. x <. 1.0R *)   x +. 1.0R
 
 val norm : #n:pos -> vector real_pos n -> vector real n
 let norm #n xs = map1 #real_pos #real #n (fun x -> x /. sum_pos #n xs) xs
@@ -48,13 +48,13 @@ let run_activation #n a xs =
 // Layers
 
 noeq type layer (i:pos) (o:pos) =
-  { bias       : real
+  { biases     : vector real o
   ; weights    : matrix real i o
   ; activation : activation
   }
 
 val run_layer : #i:pos -> #o:pos -> l:layer i o -> xs:vector real i -> Tot (vector real o)
-let run_layer #i #o l xs = run_activation #o l.activation (l.bias +> (vXm #i #o xs l.weights))
+let run_layer #i #o l xs = run_activation #o l.activation (l.biases <+> (vXm #i #o xs l.weights))
 
 
 // Networks
