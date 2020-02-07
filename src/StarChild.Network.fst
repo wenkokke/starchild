@@ -48,8 +48,8 @@ let run_activation #n a xs =
 // Layers
 
 noeq type layer (i:pos) (o:pos) =
-  { biases     : vector real o
-  ; weights    : matrix real i o
+  { weights    : matrix real i o
+  ; biases     : vector real o
   ; activation : activation
   }
 

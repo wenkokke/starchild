@@ -4,7 +4,10 @@ from tensorflow.keras.models import load_model
 
 def convert_real(x):
     """Pretty-print a float as an F* real."""
-    return '{}R'.format(x)
+    if x >= 0.0:
+        return '{0:.8f}R'.format(x)
+    else:
+        return 'negate {0:.8f}R'.format(abs(x))
 
 def convert_matrix_row(row):
     """Pretty-print a row of floats as an F* list."""
@@ -33,8 +36,8 @@ def convert_layer(index, layer):
     return ('val layer_{index} : layer {rows} {cols}\n'
             'let layer_{index} =\n'
             '  {{ weights    = {weights}\n'
-            '  , biases     = {biases}\n'
-            '  , activation = {activation}\n'
+            '  ; biases     = {biases}\n'
+            '  ; activation = {activation}\n'
             '  }}').format(
                 index=index,
                 rows=rows,
