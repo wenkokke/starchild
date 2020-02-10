@@ -48,60 +48,66 @@ def convert_layer(index, layer):
                 biases=convert_vector(biases),
                 activation=convert_activation(activation))
 
-def convert_layer_list(layers, inputs, outputs):
+def convert_layer_list(layers, n_in, n_out):
     layers[-1] = 'NLast {}'.format(layers[-1])
     layer_list = reduce(lambda x, y: 'NStep {} ({})'.format(x, y),layers)
-    return ('val model : network {inputs} {outputs}\n'
+    return ('val model : network {n_in} {n_out} {n_layers}\n'
             'let model = {layer_list}').format(
-                inputs=inputs, outputs=outputs, layer_list=layer_list)
+                n_in=n_in, n_out=n_out, layer_list=layer_list, n_layers=len(layers))
 
-def convert_model(model_path):
+def convert_model(ifile, ofile):
     """Pretty-print a Keras models from a H5 file."""
 
-    # Print file preamble
-    module_name = Path(model_path).resolve().stem
-    print(('module {}\n'
-           '\n'
-           'open StarChild.LinearAlgebra\n'
-           'open StarChild.Network\n').format(module_name))
+    # Open output file
+    with open(ofile, 'w') as os:
 
-    # Load model
-    model = load_model(model_path)
+        # Print file preamble
+        module_name = Path(ofile).resolve().stem
+        os.write(('module {}\n'
+                  '\n'
+                  'open StarChild.LinearAlgebra\n'
+                  'open StarChild.Network\n').format(module_name))
 
-    # Print layer definitions
-    layers = []
-    inputs = None
-    outputs = None
-    for index, layer in enumerate(model.layers):
-        params = layer.get_weights()
-        if len(params) > 0:
-            weights = params[0]
-            rows = weights.shape[0]
-            cols = weights.shape[1]
-            layers.append('layer_{}'.format(index))
-            if inputs is None: inputs = rows
-            outputs = cols
-            print(convert_layer(index, layer), end='\n\n')
+        # Load model
+        model = load_model(ifile)
 
-    # Print model definition
-    print(convert_layer_list(layers, inputs, outputs))
+        # Print layer definitions
+        layers = []
+        n_in = None
+        n_out = None
+        for index, layer in enumerate(model.layers):
+            params = layer.get_weights()
+            if len(params) > 0:
+                weights = params[0]
+                rows = weights.shape[0]
+                cols = weights.shape[1]
+                layers.append('layer_{}'.format(index))
+                if n_in is None: n_in = rows
+                n_out = cols
+                os.write(convert_layer(index, layer))
+                os.write('\n\n')
+
+        # Print model definition
+        os.write(convert_layer_list(layers, n_in, n_out))
 
 def help():
-    print('Usage: python convert.py -i [input_file] > [output_file]')
+    print('Usage: python convert.py -i [input_file] -o [output_file]')
     exit(2)
 
 if __name__ == "__main__":
-    path = ''
+    ifile = None
+    ofile = None
     try:
-        opts, args = getopt(argv[1:], "hi:", [])
+        opts, args = getopt(argv[1:], "hi:o:", [])
     except GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h': help()
-        if opt == '-i': path = arg
-    if Path(path).is_file():
-        convert_model(path)
-    elif path == '':
+        if opt == '-i': ifile = arg
+        if opt == '-o': ofile = arg
+    if Path(ifile).is_file():
+        convert_model(ifile, ofile)
+    elif ifile is None:
         help()
     else:
         print("Error: file '" + path + "' not found.")

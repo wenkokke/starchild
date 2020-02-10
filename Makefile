@@ -1,15 +1,20 @@
 FSTAR=fstar.exe
+MODELS=$(patsubst train_%.py,models/%.fst,$(wildcard train_*.py))
 
 test:
 	$(FSTAR) --include src src/*.fst test/*.fst
 
 .PHONY: test
 
-models/Fashion_MNIST_784_ReLU_128_Softmax_10.h5:
-	python train_fashion_mnist.py
+train: $(MODELS)
 
-models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.h5:
-	python train_fashion_mnist_pca.py
+.PHONY: train
 
-models/%.fst: models/%.h5
-	python convert.py -i $< > $@
+models/:
+	mkdir -p models
+
+models/%.h5: train_%.py | models/
+	python $<
+
+models/%.fst: models/%.h5 | models/
+	python convert.py -i $< -o $@
