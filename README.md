@@ -14,7 +14,7 @@ let model = NLast layer1
 Properties of the model can then be checked using F* assertions. For instance, if we want to check if the model above correctly implements the AND circuit, we could write the following code:
 ```fsharp
 let truthy x = 0.0R <=. x && x <. 0.5R
-let falsy x = 0.5R <. x && x <=. 1.0R
+let falsy  x = 0.5R <. x && x <=. 1.0R
 
 let _ = assert (forall x1 x2. (truthy x1 && truthy x2)
                   ==> (all truthy (run_network model [x1; x2])))
