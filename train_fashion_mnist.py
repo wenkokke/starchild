@@ -1,9 +1,15 @@
 from tensorflow import keras
 
+# Load Fashion MNIST data
 fashion_mnist = keras.datasets.fashion_mnist
 
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
+# Scale inputs between [0,1]
+train_images = train_images / 255
+test_images = test_images / 255
+
+# Train network
 model = keras.Sequential([
     keras.layers.Flatten(input_shape=(28, 28)),
     keras.layers.Dense(128, activation='relu'),
