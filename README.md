@@ -25,4 +25,4 @@ If we check this, we find out that the first assertion holds, but the second ass
 
 StarChild ships with a script to convert a subset of Keras models to F* files, and two example models. These models can be retrained using the `train_*.py` scripts, and converted to F* using the `convert.py` script. See the Makefile for details.
 
-Note: F* chokes up type checking any non-trivial model, including the two MNIST models.
+_Note:_ currently, F* chokes up type checking any non-trivial model, including the two MNIST models.
