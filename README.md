@@ -5,7 +5,7 @@ StarChild is a library for leveraging the interactive theorem proving and SMT ch
 val layer1 : layer 2 1
 let layer1 = { weights    = [[0.194R]; [0.195R]]
              ; biases     = [0.184R]
-             ; activation = Softmax
+             ; activation = None
              }
 
 val model : network 2 1 1
