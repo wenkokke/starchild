@@ -18,11 +18,20 @@ let rmax x y = if x >=. y then x else y
 val rmin : real -> real -> Tot real
 let rmin x y = if x <=. y then x else y
 
+val btwn : real -> real -> real -> Tot real
+let btwn l u x = rmax l (rmin u x)
+
 val relu : real -> Tot real
 let relu x = rmax x 0.0R
 
 val negate : real -> Tot real
 let negate x = 0.0R -. x
+
+val rabs : real -> Tot real
+let rabs x = if x >=. 0.0R then x else negate x
+
+val dist : real -> real -> Tot real
+let dist x y = rabs (x -. y)
 
 val lexp : real -> Tot real_pos
 let lexp x = if x <=. negate 1.0R then 0.00001R
@@ -36,7 +45,7 @@ val lsoftmax : #n:pos -> vector real n -> vector real n
 let lsoftmax #n xs = norm (map1 #real #real_pos #n lexp xs)
 
 val lsigmoid : real -> Tot real
-let lsigmoid x = rmax 0.0R (rmin (0.25R *. x +. 0.5R) 1.0R)
+let lsigmoid x = btwn 0.0R 1.0R (0.25R *. x +. 0.5R)
 
 val run_activation : #n:pos -> activation -> vector real n -> vector real n
 let run_activation #n a xs =

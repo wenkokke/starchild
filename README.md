@@ -5,29 +5,48 @@ It currently supports feedforward neural networks using ReLU, sigmoid, and softm
 Networks are written as follows:
 ```fsharp
 val layer1 : layer 2 1
-let layer1 = { weights    = [[0.194R]; [0.195R]]
-             ; biases     = [0.184R]
-             ; activation = None
+let layer1 = { weights    = [[5100.0R]; [1560.0R]]
+             ; biases     = [negate 5102.0R]
+             ; activation = Sigmoid
              }
 
 val model : network 2 1 1
 let model = NLast layer1
 ```
 Properties of the model can then be checked using F* assertions.
-For instance, if we want to check if the model above correctly implements the AND circuit, we could write the following code:
+Let’s check if the model correctly implements the AND gate:
 ```fsharp
-let truthy x = 0.0R <=. x && x <.  0.5R
-let falsy  x = 0.5R <.  x && x <=. 1.0R
+let _ = assert (run_network model [1.0R; 1.0R] == [1.0R])
+let _ = assert (run_network model [0.0R; 1.0R] == [0.0R])
+let _ = assert (run_network model [1.0R; 0.0R] == [0.0R])
+let _ = assert (run_network model [0.0R; 0.0R] == [0.0R])
+```
+Yes! It correctly implements the AND gate!
+However, is it robust?
+What do we mean by robust?
+That’s generally not an easy question.
+For this AND gate, let’s take robustness to mean that if the input is within some epsilon of a 0.0 or 1.0, the gate still works:
+```fsharp
+let epsilon  = 0.1R
+let truthy x = dist x 1.0R <=. epsilon
+let falsy  x = dist x 0.0R <=. epsilon
 
 let _ = assert (forall x1 x2. (truthy x1 && truthy x2)
-                  ==> (all truthy (run_network model [x1; x2])))
-let _ = assert (forall x1 x2. (falsy x1 || falsy x2)
-                  ==> (all falsy (run_network model [x1; x2])))
+                   ==> (run_network model [x1; x2] == [1.0R]))
+let _ = assert (forall x1 x2. (falsy  x1 || falsy  x2)
+                   ==> (run_network model [x1; x2] == [0.0R]))
 ```
-If we check this, we find out that the first assertion holds, but the second assertion is doesn’t! Guess we should retrain our model…
+Unfortunately, the second assertion fails.
+The network we defined is robust around truthy inputs, but it’s not robust around falsy inputs.
+Back to the drawing board, I guess?
 
-StarChild ships with a script to convert a subset of Keras models to F* files, `convert.py`, and two example models trained on the [Fashion MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset.
-These models can be retrained using the `train_*.py` scripts, and converted to F* using the `convert.py` script.
-See the Makefile for details.
-
-_Note:_ currently, F* chokes up type checking any non-trivial model, including the two MNIST models.
+StarChild ships with a script which can help you convert a subset of Keras models to F* files.
+It’s called `convert.py`, and you invoke it like this:
+```bash
+python convert.py \
+  -i models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.h5 \
+  -o models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.fst
+```
+Make sure to install the requirements first!
+StarChild also comes with two example models, trained on the [Fashion MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset.
+These models were trained using the `train_*.py` scripts.
