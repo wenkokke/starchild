@@ -1,5 +1,7 @@
 from functools import reduce
+from getopt import getopt, GetoptError
 from pathlib import Path
+from sys import argv, exit
 from tensorflow.keras.models import load_model
 
 def convert_real(x):
@@ -84,5 +86,23 @@ def convert_model(model_path):
     # Print model definition
     print(convert_layer_list(layers, inputs, outputs))
 
+def help():
+    print('Usage: python convert.py -i [input_file] > [output_file]')
+    exit(2)
+
 if __name__ == "__main__":
-    convert_model('models/Fashion_MNIST_784_ReLU_128_Softmax_10.h5')
+    path = ''
+    try:
+        opts, args = getopt(argv[1:], "hi:", [])
+    except GetoptError:
+        help()
+    for opt, arg in opts:
+        if opt == '-h': help()
+        if opt == '-i': path = arg
+    if Path(path).is_file():
+        convert_model(path)
+    elif path == '':
+        help()
+    else:
+        print("Error: file '" + path + "' not found.")
+        exit(3)

@@ -12,8 +12,8 @@ test_images = test_images / 255
 
 # Reduce dimensionality
 pca = PCA(n_components=100)
-train_images = pca.fit_transform(x_train.reshape((-1, 784))).reshape((-1, 10, 10))
-test_images = pca.transform(x_test.reshape((-1, 784))).reshape((-1, 10, 10))
+train_images = pca.fit_transform(train_images.reshape((-1, 784))).reshape((-1, 10, 10))
+test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 10, 10))
 
 # Train network
 model = keras.Sequential([
@@ -33,4 +33,4 @@ test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
 model.summary()
 
-model.savel('models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.h5')
+model.save('models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.h5')
