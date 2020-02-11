@@ -38,7 +38,7 @@ let _ = assert (forall x1 x2. (falsy  x1 || falsy  x2)
 ```
 Unfortunately, the second assertion fails.
 The network we defined is robust around truthy inputs, but it’s not robust around falsy inputs.
-Back to the drawing board, I guess?
+Back to the drawing board, I guess?<sup>[1](#unsat)</sup>
 
 StarChild ships with a script which can help you convert a subset of Keras models to F* files.
 It’s called `convert.py`, and you invoke it like this:
@@ -47,6 +47,13 @@ python convert.py \
   -i models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.h5 \
   -o models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.fst
 ```
-Make sure to install the requirements first!
-StarChild also comes with two example models, trained on the [Fashion MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset.
-These models were trained using the `train_*.py` scripts.
+Make sure to install the requirements first!<sup>[2](#pip)</sup>
+
+StarChild also comes with two example models, trained on the [Fashion MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset, using the `train_*.py` scripts.
+Currently, F* chokes up when type checking the larger of the models.
+
+---
+
+<a name="unsat">1</a>: Is there a choice of weights and bias for which the network is robust around both truthy and falsy values?
+
+<a name="pip">2</a>: Run `pip install -r requirements.txt`.
