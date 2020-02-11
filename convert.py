@@ -9,7 +9,7 @@ def convert_real(x):
     if x >= 0.0:
         return '{0:.8f}R'.format(x)
     else:
-        return '~. {0:.8f}R'.format(abs(x))
+        return '~.{0:.8f}R'.format(abs(x))
 
 def convert_matrix_row(row):
     """Pretty-print a row of floats as an F* list."""

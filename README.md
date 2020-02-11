@@ -6,7 +6,7 @@ Networks are written as follows:
 ```fsharp
 val layer1 : layer 2 1
 let layer1 = { weights    = [[5100.0R]; [1560.0R]]
-             ; biases     = [negate 5102.0R]
+             ; biases     = [~.5102.0R]
              ; activation = Sigmoid
              }
 
