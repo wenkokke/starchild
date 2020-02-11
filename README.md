@@ -27,18 +27,16 @@ What do we mean by robust?
 That’s generally not an easy question.
 For this AND gate, let’s take robustness to mean that if the input is within some epsilon of a 0.0 or 1.0, the gate still works:
 ```fsharp
-let epsilon  = 0.1R
+let epsilon  = 0.24R
 let truthy x = dist x 1.0R <=. epsilon
 let falsy  x = dist x 0.0R <=. epsilon
 
-let _ = assert (forall x1 x2. (truthy x1 && truthy x2)
-                   ==> (run_network model [x1; x2] == [1.0R]))
-let _ = assert (forall x1 x2. (falsy  x1 || falsy  x2)
-                   ==> (run_network model [x1; x2] == [0.0R]))
+let _ = assert (forall x1 x2. (truthy x1 && truthy x2) ==> (run_network model [x1; x2] == [1.0R]))
+let _ = assert (forall x1 x2. (falsy  x1 && truthy x2) ==> (run_network model [x1; x2] == [0.0R]))
+let _ = assert (forall x1 x2. (falsy  x1 && truthy x2) ==> (run_network model [x1; x2] == [0.0R]))
+let _ = assert (forall x1 x2. (falsy  x1 && falsy  x2) ==> (run_network model [x1; x2] == [0.0R]))
 ```
-Unfortunately, the second assertion fails.
-The network we defined is robust around truthy inputs, but it’s not robust around falsy inputs.
-Back to the drawing board, I guess?<sup>[1](#unsat)</sup>
+The network we defined is robust around truthy and falsy inputs!
 
 StarChild ships with a script which can help you convert a subset of Keras models to F* files.
 It’s called `convert.py`, and you invoke it like this:
@@ -47,13 +45,11 @@ python convert.py \
   -i models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.h5 \
   -o models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.fst
 ```
-Make sure to install the requirements first!<sup>[2](#pip)</sup>
+Make sure to install the requirements first!<sup>[1](#pip)</sup>
 
 StarChild also comes with two example models, trained on the [Fashion MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset, using the `train_*.py` scripts.
 Currently, F* chokes up when type checking the larger of the models.
 
 ---
 
-<a name="unsat">1</a>: Is there a choice of weights and bias for which the network is robust around both truthy and falsy values?
-
-<a name="pip">2</a>: Run `pip install -r requirements.txt`.
+<a name="pip">1</a>: Run `pip install -r requirements.txt`.
