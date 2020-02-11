@@ -5,8 +5,8 @@ It currently supports feedforward neural networks using ReLU, sigmoid, and softm
 Networks are written as follows:
 ```fsharp
 val layer1 : layer 2 1
-let layer1 = { weights    = [[5100.0R]; [1560.0R]]
-             ; biases     = [~.5102.0R]
+let layer1 = { weights    = [[228300.0R /. 13.0R]; [228300.0R /. 13.0R]]
+             ; biases     = [~.337910.0R /. 13.0R]
              ; activation = Sigmoid
              }
 
