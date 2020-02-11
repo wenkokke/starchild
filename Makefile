@@ -8,7 +8,10 @@ build:
 	$(FSTAR) --include src src/*.fst
 
 test:
-	$(FSTAR) --include src test/*.fst
+	$(FSTAR) --include src \
+		models/AND_Gate_2_Sigmoid_1.fst \
+		models/Moons_2_ReLU_10_ReLU_10_Softmax_2.fst \
+		models/SwissRolls_3_ReLU_10_ReLU_10_Softmax_2.fst
 
 .PHONY: test
 

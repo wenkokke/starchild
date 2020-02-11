@@ -50,7 +50,7 @@ def convert_layer(index, layer):
 
 def convert_layer_list(layers, n_in, n_out):
     layers[-1] = 'NLast {}'.format(layers[-1])
-    layer_list = reduce(lambda x, y: 'NStep {} ({})'.format(x, y),layers)
+    layer_list = reduce(lambda x, y: 'NStep {} ({})'.format(y, x),reversed(layers))
     return ('val model : network {n_in} {n_out} {n_layers}\n'
             'let model = {layer_list}').format(
                 n_in=n_in, n_out=n_out, layer_list=layer_list, n_layers=len(layers))

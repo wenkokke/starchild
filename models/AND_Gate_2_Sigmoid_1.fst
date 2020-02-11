@@ -1,4 +1,4 @@
-module AND_gate
+module AND_Gate_2_Sigmoid_1
 
 open FStar.Real
 open StarChild.LinearAlgebra
