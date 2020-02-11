@@ -24,19 +24,19 @@ let btwn l u x = rmax l (rmin u x)
 val relu : real -> Tot real
 let relu x = rmax x 0.0R
 
-val negate : real -> Tot real
-let negate x = 0.0R -. x
+val ( ~. ) : real -> Tot real
+let ( ~. ) x = 0.0R -. x
 
 val rabs : real -> Tot real
-let rabs x = if x >=. 0.0R then x else negate x
+let rabs x = if x >=. 0.0R then x else ~. x
 
 val dist : real -> real -> Tot real
 let dist x y = rabs (x -. y)
 
 val lexp : real -> Tot real_pos
-let lexp x = if x <=. negate 1.0R then 0.00001R
-        else if x >=. 1.0R        then 5.898R *. x -. 3.898R
-        else (* 1.0R <. x <. 1.0R *)   x +. 1.0R
+let lexp x = if x <=. ~. 1.0R then 0.00001R
+        else if x >=.    1.0R then 5.898R *. x -. 3.898R
+        else x +. 1.0R
 
 val norm : #n:pos -> vector real_pos n -> vector real n
 let norm #n xs = map1 #real_pos #real #n (fun x -> x /. sum_pos #n xs) xs

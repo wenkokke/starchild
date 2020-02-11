@@ -1,6 +1,9 @@
 FSTAR=fstar.exe
 MODELS=$(patsubst train_%.py,models/%.fst,$(wildcard train_*.py))
 
+build:
+	$(FSTAR) --include src src/*.fst
+
 test:
 	$(FSTAR) --include src src/*.fst test/*.fst
 

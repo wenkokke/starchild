@@ -9,7 +9,7 @@ def convert_real(x):
     if x >= 0.0:
         return '{0:.8f}R'.format(x)
     else:
-        return 'negate {0:.8f}R'.format(abs(x))
+        return '~. {0:.8f}R'.format(abs(x))
 
 def convert_matrix_row(row):
     """Pretty-print a row of floats as an F* list."""
@@ -66,7 +66,8 @@ def convert_model(ifile, ofile):
         os.write(('module {}\n'
                   '\n'
                   'open StarChild.LinearAlgebra\n'
-                  'open StarChild.Network\n').format(module_name))
+                  'open StarChild.Network\n'
+                  '\n').format(module_name))
 
         # Load model
         model = load_model(ifile)

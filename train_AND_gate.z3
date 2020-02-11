@@ -21,7 +21,7 @@
 (assert (= (nn 1.0 0.0) 0.0))
 (assert (= (nn 0.0 0.0) 0.0))
 
-;; (assert (forall ((x1 Real) (x2 Real)) (=> (and (truthy x1) (truthy x2)) (truthy (nn x1 x2)))))
+(assert (forall ((x1 Real) (x2 Real)) (=> (and (truthy x1) (truthy x2)) (truthy (nn x1 x2)))))
 ;; (assert (forall ((x1 Real) (x2 Real)) (=> (or  (falsy  x1) (falsy  x2)) (falsy  (nn x1 x2)))))
 
 (check-sat)
