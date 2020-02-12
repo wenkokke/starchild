@@ -1,8 +1,8 @@
 MODELS=$(patsubst train_%.py,models/%.fst,$(wildcard train_*.py))
 FUEL=9999
 IFUEL=9999
-RLIMIT=60
-FSTAR=fstar.exe --fuel $(FUEL) --ifuel $(IFUEL) --z3rlimit $(RLIMIT)
+RLIMIT=9999
+FSTAR=fstar.exe --cache_checked_modules --fuel $(FUEL) --ifuel $(IFUEL) --z3rlimit $(RLIMIT)
 
 build:
 	$(FSTAR) --include src src/*.fst
