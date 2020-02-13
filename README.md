@@ -52,4 +52,6 @@ Currently, F* chokes up when type checking the larger of the models.
 
 ---
 
+You may also be interested in StarChild’s cousin, [Leadbeater](https://github.com/wenkokke/leadbeater)!
+
 <a name="pip">1</a>: Run `pip install -r requirements.txt`.
