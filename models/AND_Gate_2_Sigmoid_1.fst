@@ -17,12 +17,12 @@ let epsilon  = 0.24R
 let truthy x = dist x 1.0R <. epsilon
 let falsy  x = dist x 0.0R <. epsilon
 
-let _ = assert (run_network model [1.0R; 1.0R] == [1.0R])
-let _ = assert (run_network model [0.0R; 1.0R] == [0.0R])
-let _ = assert (run_network model [1.0R; 0.0R] == [0.0R])
-let _ = assert (run_network model [0.0R; 0.0R] == [0.0R])
+let _ = assert(run_network model [1.0R; 1.0R] == [1.0R])
+let _ = assert(run_network model [0.0R; 1.0R] == [0.0R])
+let _ = assert(run_network model [1.0R; 0.0R] == [0.0R])
+let _ = assert(run_network model [0.0R; 0.0R] == [0.0R])
 
-let _ = assert (forall x1 x2. truthy x1 && truthy x2 ==> run_network model [x1; x2] == [1.0R])
-let _ = assert (forall x1 x2. falsy  x1 && truthy x2 ==> run_network model [x1; x2] == [0.0R])
-let _ = assert (forall x1 x2. truthy x1 && falsy  x2 ==> run_network model [x1; x2] == [0.0R])
-let _ = assert (forall x1 x2. falsy  x1 && falsy  x2 ==> run_network model [x1; x2] == [0.0R])
+let _ = assert(forall (x1:real{truthy x1}) (x2:real{truthy x2}). run_network model [x1; x2] == [1.0R])
+let _ = assert(forall (x1:real{falsy  x1}) (x2:real{truthy x2}). run_network model [x1; x2] == [0.0R])
+let _ = assert(forall (x1:real{truthy x1}) (x2:real{falsy  x2}). run_network model [x1; x2] == [0.0R])
+let _ = assert(forall (x1:real{falsy  x1}) (x2:real{falsy  x2}). run_network model [x1; x2] == [0.0R])
