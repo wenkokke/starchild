@@ -7,7 +7,7 @@ open StarChild.LinearAlgebra
 // Activation functions
 
 noeq type activation =
-  | None    : activation
+  | Linear  : activation
   | ReLU    : activation
   | Sigmoid : activation
   | Softmax : activation
@@ -50,7 +50,7 @@ let lsigmoid x = btwn 0.0R 1.0R (0.25R *. x +. 0.5R)
 val run_activation : #n:pos -> activation -> vector real n -> vector real n
 let run_activation #n a xs =
   match a with
-  | None    -> xs
+  | Linear  -> xs
   | ReLU    -> map1 relu xs
   | Sigmoid -> map1 lsigmoid xs
   | Softmax -> lsoftmax xs

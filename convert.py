@@ -25,7 +25,11 @@ def convert_vector(vector):
 
 def convert_activation(activation):
     """Pretty-print a Keras activation function as a StarChild constructor."""
-    return {'relu': 'ReLU', 'sigmoid': 'Sigmoid', 'softmax': 'Softmax'}[activation]
+    return {
+        'linear': 'Linear',
+        'relu': 'ReLU',
+        'sigmoid': 'Sigmoid',
+        'softmax': 'Softmax'}[activation]
 
 def convert_layer(index, layer):
     """Pretty-print a Keras layer as a StarChild definition."""
