@@ -5,7 +5,7 @@ from sys import argv, exit
 def mk_model(units):
     """Create a model with a number of units and save it."""
     model = keras.Sequential([
-        keras.layers.Dense(units, input_shape=(1,)),
+        keras.layers.Dense(input_shape=(units,), units=1),
     ])
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',

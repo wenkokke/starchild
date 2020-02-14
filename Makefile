@@ -1,5 +1,5 @@
 MODELS=$(patsubst train_%.py,models/%.fst,$(wildcard train_*.py))
-FUEL=100
+FUEL=101
 IFUEL=2
 RLIMIT=300
 FSTAR=fstar.exe --fuel $(FUEL) --ifuel $(IFUEL) --z3rlimit $(RLIMIT)
@@ -41,22 +41,28 @@ models/%.fst: models/%.h5 | models/
 
 
 .PHONY: benchmark
-benchmark: bench/results.json bench/results.md
+benchmark: bench/results.csv bench/results.json bench/results.md
 
-bench/results.json: $(BENCHMARKS_FST)
-	hyperfine --export-json bench/results.json --export-markdown bench/results.md -P n_params $(BENCHMARK_START) $(BENCHMARK_STOP) -D $(BENCHMARK_STEP) '$(FSTAR) --include src bench/Random_2_ReLU_{n_params}_Softmax_2.fst'
+bench/results.csv: $(BENCHMARKS_FST)
+	hyperfine --export-csv bench/results.csv --export-json bench/results.json --export-markdown bench/results.md -P n_params $(BENCHMARK_START) $(BENCHMARK_STOP) -D $(BENCHMARK_STEP) '$(FSTAR) --include src bench/Random_{n_params}_Linear_1.fst'
 
-bench/results.md: bench/results.json
+bench/results.json: bench/results.csv
 	@if test -f $@; then :; else \
-		rm -f bench/results.json; \
-		$(MAKE) $(AM_MAKEFLAGS) bench/results.json; \
+		rm -f bench/results.csv; \
+		$(MAKE) $(AM_MAKEFLAGS) bench/results.csv; \
+	fi
+
+bench/results.md: bench/results.csv
+	@if test -f $@; then :; else \
+		rm -f bench/results.csv; \
+		$(MAKE) $(AM_MAKEFLAGS) bench/results.csv; \
 	fi
 
 bench/:
 	mkdir -p bench
 
 $(BENCHMARKS_H5_HD): mk_bench.py | bench/
-	python mk_bench.py
+	python mk_bench.py --start $(BENCHMARK_START) --stop $(BENCHMARK_STOP) --step $(BENCHMARK_STEP)
 
 define BENCHMARK_H5_template
 $(1): $(BENCHMARKS_H5_HD)
