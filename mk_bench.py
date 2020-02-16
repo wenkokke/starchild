@@ -24,7 +24,7 @@ if __name__ == "__main__":
     stop  = 100
     step  = 1
     try:
-        opts, args = getopt(argv[1:], 'h', ['start', 'stop', 'step'])
+        opts, args = getopt(argv[1:], 'h', ['start=', 'stop=', 'step=])
     except GetoptError:
         help()
     for opt, arg in opts:
