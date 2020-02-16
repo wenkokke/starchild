@@ -1,5 +1,5 @@
 MODELS=$(patsubst train_%.py,models/%.fst,$(wildcard train_*.py))
-FUEL=101
+FUEL=8
 IFUEL=2
 RLIMIT=300
 FSTAR=fstar.exe --fuel $(FUEL) --ifuel $(IFUEL) --z3rlimit $(RLIMIT)
@@ -24,7 +24,8 @@ test:
 	$(FSTAR) --include src \
 		models/AND_Gate_2_Sigmoid_1.fst \
 		models/Moons_2_ReLU_10_ReLU_10_Softmax_2.fst \
-		models/SwissRolls_3_ReLU_10_ReLU_10_Softmax_2.fst
+		models/SwissRolls_3_ReLU_10_ReLU_10_Softmax_2.fst \
+		models/Fashion_MNIST_PCA_100_ReLU_64_Softmax_10.fst
 
 
 .PHONY: train

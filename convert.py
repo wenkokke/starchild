@@ -1,4 +1,4 @@
-from functools import reduce
+from functools import reduce, partial
 from getopt import getopt, GetoptError
 from pathlib import Path
 from sys import argv, exit
@@ -11,13 +11,26 @@ def convert_real(x):
     else:
         return '~.{0:.8f}R'.format(abs(x))
 
+def assert_length(vals, n_vals):
+    """Pretty-print an assertion stating `vals` has length `n_vals`."""
+    return ('(let v = {vals}\n'
+            ' in assert_norm (length v = {n_vals}); v)'.format(
+                vals=vals, n_vals=n_vals))
+
 def convert_matrix_row(row):
     """Pretty-print a row of floats as an F* list."""
-    return '[{}]'.format('; '.join(map(convert_real, row)))
+    n_vals=len(row)
+    vals='[{}]'.format('; '.join(map(convert_real, row)))
+    return assert_length(vals, n_vals)
 
 def convert_matrix(matrix):
     """Pretty-print a Keras matrix as a StarChild matrix."""
-    return '[ {}\n]'.format('\n; '.join(map(convert_matrix_row, matrix.tolist())))
+    n_vals=len(matrix)
+    vals=map(convert_matrix_row, matrix.tolist())
+    vals=map(partial(indent_by,2), vals)
+    vals='[ {}\n]'.format('\n; '.join(vals))
+    vals=indent_by(9,vals)
+    return assert_length(vals, n_vals)
 
 def convert_vector(vector):
     """Pretty-print a Keras vector as a StarChild vector."""
@@ -30,6 +43,10 @@ def convert_activation(activation):
         'relu': 'ReLU',
         'sigmoid': 'Sigmoid',
         'softmax': 'Softmax'}[activation]
+
+def indent_by(n, lines):
+    """Indent each line after the first by `n`."""
+    return lines.replace('\n', '\n'+n*' ')
 
 def convert_layer(index, layer):
     """Pretty-print a Keras layer as a StarChild definition."""
@@ -48,8 +65,8 @@ def convert_layer(index, layer):
                 index=index,
                 rows=rows,
                 cols=cols,
-                weights=convert_matrix(weights).replace('\n','\n'+17*' '),
-                biases=convert_vector(biases),
+                weights=indent_by(17, convert_matrix(weights)),
+                biases=indent_by(17, convert_vector(biases)),
                 activation=convert_activation(activation))
 
 def convert_layer_list(layers, n_in, n_out):
