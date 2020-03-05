@@ -82,12 +82,18 @@ let rec run_network #i #o #n ls xs = match ls with
 
 //Distances
 
-val sq : real -> real
+
+// 1. Square Eucledian distance : (d([x;y], (z;w))^2 = (x-z)^2 + (y-w)^2
+
+val sq : real -> Tot real
 let sq x = x *. x 
 
-val dist_sq : real -> real -> real -> Tot real
-let dist_sq z x y =  sq (x -. y)
+val dist_sq : real -> real -> Tot real
+let dist_sq x y =  sq (x -. y)
+
+val vec_sq_dist : #i:pos -> xs:vector real i -> ys:vector real i -> Tot (vector real i)
+let vec_sq_dist #i xs ys = map2 dist_sq xs ys 
 
 val eu_dist : #i:pos -> xs:vector real i -> ys:vector real i -> Tot real
-let eu_dist  #i xs ys = fold_left2 dist_sq 1.0R xs ys    
+let eu_dist  #i xs ys = fold_left (+.) 1.0R (vec_sq_dist #i xs ys)    
 
