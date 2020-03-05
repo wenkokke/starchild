@@ -35,10 +35,10 @@ models/:
 	mkdir -p models
 
 models/%.h5: train_%.py | models/
-	python $<
+	python3 $<
 
 models/%.fst: models/%.h5 | models/
-	python convert.py -i $< -o $@
+	python3 convert.py -i $< -o $@
 
 
 .PHONY: benchmark
@@ -63,7 +63,7 @@ bench/:
 	mkdir -p bench
 
 $(BENCHMARKS_H5_HD): mk_bench.py | bench/
-	python mk_bench.py --start $(BENCHMARK_START) --stop $(BENCHMARK_STOP) --step $(BENCHMARK_STEP)
+	python3 mk_bench.py --start $(BENCHMARK_START) --stop $(BENCHMARK_STOP) --step $(BENCHMARK_STEP)
 
 define BENCHMARK_H5_template
 $(1): $(BENCHMARKS_H5_HD)
@@ -76,4 +76,4 @@ endef
 $(foreach bm,$(BENCHMARKS_H5_TL),$(eval $(call BENCHMARK_H5_template,$(bm))))
 
 bench/%.fst: bench/%.h5
-	python convert.py -i $< -o $@
+	python3 convert.py -i $< -o $@

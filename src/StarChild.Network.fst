@@ -78,3 +78,16 @@ val run_network : #i:pos -> #o:pos -> #n:pos -> ls:network i o n -> xs:vector re
 let rec run_network #i #o #n ls xs = match ls with
   | NLast l    -> run_layer l xs
   | NStep l ls -> run_network ls (run_layer l xs)
+
+
+//Distances
+
+val sq : real -> real
+let sq x = x *. x 
+
+val dist_sq : real -> real -> real -> Tot real
+let dist_sq z x y =  sq (x -. y)
+
+val eu_dist : #i:pos -> xs:vector real i -> ys:vector real i -> Tot real
+let eu_dist  #i xs ys = fold_left2 dist_sq 1.0R xs ys    
+
