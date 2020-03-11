@@ -41,7 +41,8 @@ train_ideal = train_images[ideal_inds]
 
 # Reduce dimensionality
 pca = PCA(n_components=64)
-train_images = pca.fit_transform(train_images.reshape((-1, 784))).reshape((-1, 8, 8))
+train_images = pca.fit_transform(train_images.reshape((-1, 784))).reshape((-1, 8
+                                                                           , 8))
 test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 8, 8))
 
 # TODO 2/2: ... and save this in your preferred format:
@@ -68,4 +69,4 @@ test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
 model.summary()
 
-# model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
+model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')

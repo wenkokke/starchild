@@ -1,7 +1,7 @@
 from sklearn.decomposition import PCA
 from tensorflow import keras
 
-# Load Fashion MNIST data
+# Load MNIST data
 fashion_mnist = keras.datasets.mnist
 
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
