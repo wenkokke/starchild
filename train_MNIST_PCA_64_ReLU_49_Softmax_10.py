@@ -55,6 +55,9 @@ model = keras.Sequential([
     keras.layers.Dense(10, activation='softmax')
 ])
 
+# model.compile(
+#     optimizer='adam', loss='sparse_categorical_crossentropy',
+#     metrics=['accuracy'])
 model.compile(
     optimizer=keras.optimizers.Adam(), loss='sparse_categorical_crossentropy',
     metrics=['accuracy'])
@@ -74,3 +77,4 @@ print('\nTest accuracy:', test_acc)
 model.summary()
 
 model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
+
