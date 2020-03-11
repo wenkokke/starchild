@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pickle as pkl
 from sklearn.decomposition import PCA
 from tensorflow import keras
 
@@ -9,8 +10,8 @@ fashion_mnist = keras.datasets.mnist
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
 
 # Scale inputs between [0,1]
-train_images = train_images / 255
-test_images = test_images / 255
+train_images = train_images.reshape((-1, 784)) / 255
+test_images = test_images.reshape((-1, 784)) / 255
 
 
 ideal = {
@@ -38,33 +39,37 @@ ideal_inds = np.array([*ideal.values()]).flatten().tolist()
 
 # TODO 1/2: Save this in your preferred format ..
 train_ideal = train_images[ideal_inds]
+np.save('models/train_ideal.npy', train_ideal.reshape((-1, 784)))
+np.savetxt('models/train_ideal.txt', train_ideal.reshape((-1, 784)), delimiter= '')
+pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal', 'wb'))
+pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.xml', 'wb'))
 
 # Reduce dimensionality
 pca = PCA(n_components=64)
-train_images = pca.fit_transform(train_images.reshape((-1, 784))).reshape((-1, 8
-                                                                           , 8))
-test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 8, 8))
+train_images = pca.fit_transform(
+    train_images.reshape((-1, 784))).reshape((-1, 64))
+test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 64))
+
 
 # TODO 2/2: ... and save this in your preferred format:
 train_ideal = train_images[ideal_inds]
+np.save('models/train_ideal_pca.npy', train_ideal.reshape((-1, 64)))
+np.savetxt('models/train_ideal_pca.txt', train_ideal.reshape((-1, 64)), delimiter= '')
+pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca', 'wb'))
+pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.xml', 'wb'))
+
 
 # Train network
 model = keras.Sequential([
-    keras.layers.Flatten(input_shape=(8, 8)),
+    # keras.layers.Flatten(input_shape=(8, 8)),
     keras.layers.Dense(49, activation='relu'),
     keras.layers.Dense(10, activation='softmax')
 ])
 
-# model.compile(
-#     optimizer='adam', loss='sparse_categorical_crossentropy',
-#     metrics=['accuracy'])
 model.compile(
-    optimizer=keras.optimizers.Adam(), loss='sparse_categorical_crossentropy',
+    optimizer='adam', loss='sparse_categorical_crossentropy',
     metrics=['accuracy'])
 
-#model.compile(
-#    optimizer='adam', loss='sparse_categorical_crossentropy',
-#    metrics=['accuracy'])
 
 model.fit(train_images, train_labels, epochs=10)
 
