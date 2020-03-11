@@ -68,4 +68,4 @@ test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
 model.summary()
 
-# model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
+model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
