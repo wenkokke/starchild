@@ -41,8 +41,13 @@ ideal_inds = np.array([*ideal.values()]).flatten().tolist()
 train_ideal = train_images[ideal_inds]
 np.save('models/train_ideal.npy', train_ideal.reshape((-1, 784)))
 np.savetxt('models/train_ideal.txt', train_ideal.reshape((-1, 784)), delimiter= '')
-pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal', 'wb'))
+pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.pickle', 'wb'))
 pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.xml', 'wb'))
+
+# train_ideal = np.load('models/train_ideal.npy')
+# train_ideal = np.loadtxt('models/train_ideal.txt')
+# with open('models/train_ideal.pickle', 'rb') as file:
+#     train_ideal = pkl.load(file)
 
 # Reduce dimensionality
 pca = PCA(n_components=64)
@@ -55,7 +60,7 @@ test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 64))
 train_ideal = train_images[ideal_inds]
 np.save('models/train_ideal_pca.npy', train_ideal.reshape((-1, 64)))
 np.savetxt('models/train_ideal_pca.txt', train_ideal.reshape((-1, 64)), delimiter= '')
-pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca', 'wb'))
+pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.pickle', 'wb'))
 pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.xml', 'wb'))
 
 
