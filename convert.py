@@ -41,7 +41,7 @@ def convert_raw_vector(vector):
     values. """
     vals = ', '.join([convert_real(i) for i in vector.flatten()])
     vals_ls = ('[' + vals + ']')
-    return vals_ls.replace("'", "")
+    return vals_ls.replace("'", "").replace(",", ";")
 
 def convert_activation(activation):
     """Pretty-print a Keras activation function as a StarChild constructor."""
