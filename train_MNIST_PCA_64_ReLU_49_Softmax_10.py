@@ -17,11 +17,12 @@ test_images = test_images.reshape((-1, 784)) / 255
 pca = PCA(n_components=64)
 train_images = pca.fit_transform(
     train_images.reshape((-1, 784))).reshape((-1, 64))
-test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 64))
+test_images = pca.transform(
+    test_images.reshape((-1, 784))).reshape((-1, 64))
 
 # Train network
 model = keras.Sequential([
-    keras.layers.Dense(49, activation='relu'),
+    keras.layers.Dense(49, activation='relu', input_shape=(64,)),
     keras.layers.Dense(10, activation='softmax')
 ])
 
@@ -41,12 +42,13 @@ model.summary()
 model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
 
 # Save inputs and outputs for ideal images
-ideal_inds = {'0':4655 , '1':7748 , '2':1584, '3':26364, '4':26172,
-              '5':19175, '6':58755, '7':9724, '8':35484, '9':19085}
-ideal_imgs = train_images[list(ideal_inds.values())]
-ideal_preds = model.predict(ideal_imgs)
+ideal = {'0':4655 , '1':7748 , '2':1584, '3':26364, '4':26172,
+         '5':19175, '6':58755, '7':9724, '8':35484, '9':19085}
 
-print('Predictions for ideal images [0..9]:', np.argmax(ideal_preds, axis=1))
+ideal = {label: (ideal_in,
+                 model.predict(np.array([ideal_in]))[0])
+         for label, index in ideal.items()
+         for ideal_in in [train_images[index]]}
 
-np.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.ideal.npy',
-        np.column_stack((ideal_imgs, ideal_preds)))
+with open('models/MNIST_PCA_64_ReLU_49_Softmax_10.ideal.pkl', 'wb') as fp:
+    pkl.dump(ideal, fp)

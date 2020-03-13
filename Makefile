@@ -38,8 +38,12 @@ models/%.h5: train_%.py | models/
 	python3 $<
 
 models/%.fst: models/%.h5 | models/
+	$(eval IDEAL := $(<:.h5=.ideal.pkl))
+ifeq (,$(wildcard ./$(IDEAL)))
 	python3 convert.py -i $< -o $@
-
+else
+	python3 convert.py --with-ideal=$(IDEAL) -i $< -o $@
+endif
 
 .PHONY: benchmark
 benchmark: bench/results.csv bench/results.json bench/results.md

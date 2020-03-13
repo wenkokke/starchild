@@ -1,6 +1,7 @@
 from functools import reduce, partial
 from getopt import getopt, GetoptError
 from pathlib import Path
+import pickle as pkl
 from sys import argv, exit
 from tensorflow.keras.models import load_model
 
@@ -36,13 +37,6 @@ def convert_vector(vector):
     """Pretty-print a Keras vector as a StarChild vector."""
     return convert_matrix_row(vector.tolist()[0])
 
-def convert_raw_vector(vector):
-    """ Pretty-print a Keras vector as a StarChild vector with only the 
-    values. """
-    vals = ', '.join([convert_real(i) for i in vector.flatten()])
-    vals_ls = ('[' + vals + ']')
-    return vals_ls.replace("'", "").replace(",", ";")
-
 def convert_activation(activation):
     """Pretty-print a Keras activation function as a StarChild constructor."""
     return {
@@ -54,6 +48,21 @@ def convert_activation(activation):
 def indent_by(n, lines):
     """Indent each line after the first by `n`."""
     return lines.replace('\n', '\n'+n*' ')
+
+def convert_ideal(ideal_label, ideal_in, ideal_out):
+    """"""
+    n_ideal_in=len(ideal_in)
+    n_ideal_out=len(ideal_out)
+    return ('val ideal_{ideal_label}_in : {n_ideal_in}\n'
+            'let ideal_{ideal_label}_in = {ideal_in}\n'
+            '\n'
+            'val ideal_{ideal_label}_out : {n_ideal_out}\n'
+            'let ideal_{ideal_label}_out = {ideal_out}').format(
+                ideal_label=ideal_label,
+                n_ideal_in=n_ideal_in,
+                n_ideal_out=n_ideal_out,
+                ideal_in=convert_matrix_row(ideal_in.tolist()),
+                ideal_out=convert_matrix_row(ideal_out.tolist()))
 
 def convert_layer(index, layer):
     """Pretty-print a Keras layer as a StarChild definition."""
@@ -83,14 +92,14 @@ def convert_layer_list(layers, n_in, n_out):
             'let model = {layer_list}').format(
                 n_in=n_in, n_out=n_out, layer_list=layer_list, n_layers=len(layers))
 
-def convert_model(ifile, ofile):
+def convert_model(model_file, fstar_file, ideal_file=None):
     """Pretty-print a Keras models from a H5 file."""
 
     # Open output file
-    with open(ofile, 'w') as os:
+    with open(fstar_file, 'w') as os:
 
         # Print file preamble
-        module_name = Path(ofile).resolve().stem
+        module_name = Path(fstar_file).resolve().stem
         os.write(('module {}\n'
                   '\n'
                   'open StarChild.LinearAlgebra\n'
@@ -98,7 +107,7 @@ def convert_model(ifile, ofile):
                   '\n').format(module_name))
 
         # Load model
-        model = load_model(ifile)
+        model = load_model(model_file)
 
         # Print layer definitions
         layers = []
@@ -119,25 +128,38 @@ def convert_model(ifile, ofile):
         # Print model definition
         os.write(convert_layer_list(layers, n_in, n_out))
 
+        # Print ideal inputs
+        if not (ideal_file is None):
+            with open(ideal_file, 'rb') as fp:
+                ideal = pkl.load(fp)
+                for ideal_label, ideal_data in ideal.items():
+                    ideal_in, ideal_out = ideal_data
+                    os.write(convert_ideal(ideal_label, ideal_in, ideal_out))
+                    os.write('\n\n')
+
 def help():
-    print('Usage: python convert.py -i [input_file] -o [output_file]')
+    print('Usage: python convert.py [--with-ideal=[ideal_file]] -i [model_file] -o [fstar_file]')
     exit(2)
 
 if __name__ == "__main__":
-    ifile = None
-    ofile = None
+    model_file = None
+    fstar_file = None
+    ideal_file = None
     try:
-        opts, args = getopt(argv[1:], "hi:o:", [])
+        opts, args = getopt(argv[1:], "hi:o:", ["with-ideal="])
     except GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h': help()
-        if opt == '-i': ifile = arg
-        if opt == '-o': ofile = arg
-    if Path(ifile).is_file():
-        convert_model(ifile, ofile)
+        if opt == '-i': model_file = arg
+        if opt == '-o': fstar_file = arg
+        if opt == '--with-ideal': ideal_file = arg
+    if Path(model_file).is_file():
+        if not (ideal_file is None or Path(ideal_file).is_file()):
+            print("Error: file '" + ideal_file + "' not found.")
+        convert_model(model_file, fstar_file, ideal_file=ideal_file)
     elif ifile is None:
         help()
     else:
-        print("Error: file '" + path + "' not found.")
+        print("Error: file '" + model_file + "' not found.")
         exit(3)
