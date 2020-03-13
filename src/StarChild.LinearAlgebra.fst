@@ -5,6 +5,7 @@ include FStar.List.Tot
 open FStar.Real
 open FStar.Mul
 
+type real_nat = x:real {x >=. 0.0R}
 type real_pos = x:real {x >. 0.0R}
 type vector 'a n = v:list 'a {length v == n}
 type matrix 'a r c = vector (vector 'a c) r
@@ -30,6 +31,11 @@ let rec sum_pos_or #n x xs = match xs with
 val sum_pos : #n:pos -> xs:vector real_pos n -> real_pos
 let sum_pos #n xs = match xs with
   | (y :: ys) -> sum_pos_or #(n - 1) y ys
+
+val sum_nat : #n:nat -> xs:vector real_nat n -> real_nat
+let rec sum_nat #n xs = match xs with
+  | [] -> 0.0R
+  | (y :: ys) -> y +. sum_nat #(n - 1) ys
 
 val sum : #n:nat -> xs:vector real n -> real
 let sum #n xs = fold_right (fun x y -> x +. y) xs 0.0R
@@ -98,3 +104,21 @@ let mXv #r #c xss ys = from_col (mXm xss (to_col #real #c ys))
 
 val ( <* ) : #r:nat -> #c:nat -> xss:matrix real r c -> ys:vector real c -> Tot (vector real r)
 let ( <* ) = mXv
+
+
+
+//Distances
+
+
+// 1. Square Eucledian distance : (d([x;y], (z;w))^2 = (x-z)^2 + (y-w)^2
+
+val sq : real -> Tot real_nat
+let sq x = x *. x
+
+val sq_euclidean_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real_nat
+let sq_euclidean_dist #n xs ys =
+  sum_nat #n (map2 #real #real #real_nat #n (fun x y -> sq (x -. y)) xs ys)
+
+// Test: sq_euclidean_dist
+
+let _ = assert_norm (sq_euclidean_dist #2 [0.0R; 0.0R] [1.0R; 1.0R] = 2.0R)
