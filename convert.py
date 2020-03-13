@@ -36,6 +36,13 @@ def convert_vector(vector):
     """Pretty-print a Keras vector as a StarChild vector."""
     return convert_matrix_row(vector.tolist()[0])
 
+def convert_raw_vector(vector):
+    """ Pretty-print a Keras vector as a StarChild vector with only the 
+    values. """
+    vals = ', '.join([convert_real(i) for i in vector.flatten()])
+    vals_ls = ('[' + vals + ']')
+    return vals_ls.replace("'", "")
+
 def convert_activation(activation):
     """Pretty-print a Keras activation function as a StarChild constructor."""
     return {

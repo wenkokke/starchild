@@ -4,6 +4,8 @@ import pickle as pkl
 from sklearn.decomposition import PCA
 from tensorflow import keras
 
+import convert
+
 # Load Fashion MNIST data
 fashion_mnist = keras.datasets.mnist
 
@@ -39,10 +41,16 @@ ideal_inds = np.array([*ideal.values()]).flatten().tolist()
 
 # TODO 1/2: Save this in your preferred format ..
 train_ideal = train_images[ideal_inds]
-np.save('models/train_ideal.npy', train_ideal.reshape((-1, 784)))
-np.savetxt('models/train_ideal.txt', train_ideal.reshape((-1, 784)), delimiter= '')
-pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.pickle', 'wb'))
-pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.xml', 'wb'))
+
+file = open('ideal_train.txt', 'w')
+for i in range(train_ideal.shape[0]):
+    file.write(convert.convert_raw_vector(train_ideal[0]) + '\n')
+file.close()
+
+# np.save('models/train_ideal.npy', train_ideal.reshape((-1, 784)))
+# np.savetxt('models/train_ideal.txt', train_ideal.reshape((-1, 784)), delimiter= '')
+# pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.pickle', 'wb'))
+# pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.xml', 'wb'))
 
 # train_ideal = np.load('models/train_ideal.npy')
 # train_ideal = np.loadtxt('models/train_ideal.txt')
@@ -58,10 +66,16 @@ test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 64))
 
 # TODO 2/2: ... and save this in your preferred format:
 train_ideal = train_images[ideal_inds]
-np.save('models/train_ideal_pca.npy', train_ideal.reshape((-1, 64)))
-np.savetxt('models/train_ideal_pca.txt', train_ideal.reshape((-1, 64)), delimiter= '')
-pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.pickle', 'wb'))
-pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.xml', 'wb'))
+
+file = open('ideal_train_pca.txt', 'w')
+for i in range(train_ideal.shape[0]):
+    file.write(convert.convert_raw_vector(train_ideal[0]) + '\n')
+file.close()
+
+# np.save('models/train_ideal_pca.npy', train_ideal.reshape((-1, 64)))
+# np.savetxt('models/train_ideal_pca.txt', train_ideal.reshape((-1, 64)), delimiter= '')
+# pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.pickle', 'wb'))
+# pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.xml', 'wb'))
 
 
 # Train network
