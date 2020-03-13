@@ -94,6 +94,34 @@ let dist_sq x y =  sq (x -. y)
 val vec_sq_dist : #i:pos -> xs:vector real i -> ys:vector real i -> Tot (vector real i)
 let vec_sq_dist #i xs ys = map2 dist_sq xs ys 
 
-val eu_dist : #i:pos -> xs:vector real i -> ys:vector real i -> Tot real
-let eu_dist  #i xs ys = fold_left (+.) 1.0R (vec_sq_dist #i xs ys)    
+val eu_dist : #i:pos -> xs:vector real i -> ys:vector real i ->  Tot real
+let eu_dist  #i xs ys = fold_left (+.) 0.0R (vec_sq_dist #i xs ys)    
 
+ // test some examples of usage:
+
+// epsilon is some real number that measures the distance
+let epsilon  = 0.5R
+
+let test_distance x = (eu_dist #2 x [1.0R; 0.0R]) <. epsilon
+let _ = assert (test_distance [0.99999940R; 0.00000000R] )
+
+// more generally, 
+
+val test_dist : #i:pos -> xs:vector real i -> ys:vector real i -> epsilon: real -> Tot bool
+let test_dist  #i xs ys epsilon = (eu_dist #i xs ys) <. epsilon
+
+//example:
+let _  = assert ( test_dist #2 [1.0R; 0.0R] [0.99999940R; 0.00000000R] epsilon)
+
+
+// usage within other expressions:
+
+val some_vec : vector real 10
+let some_vec = let v = [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000054R] in assert_norm (length v = 10); v
+
+val vec_dist:  xs: vector real 10 -> Tot bool
+let vec_dist  xs =  test_dist #10  xs some_vec epsilon
+
+//let _ = assert(test_dist #10 some_vec some_vec 10.0R)
+
+//let _ = assert(vec_dist some_vec) 
