@@ -113,14 +113,21 @@ let test_dist  #i xs ys epsilon = (eu_dist #i xs ys) <. epsilon
 //example:
 let _  = assert ( test_dist #2 [1.0R; 0.0R] [0.99999940R; 0.00000000R] epsilon)
 
+// funnily enough, this fails (comparing two identical vectors!):
+//let _  = assert ( test_dist #10  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000054R]  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R;  0.00000054R] epsilon)
 
-// usage within other expressions:
+// Subtyping check failed; expected type vector real 10; got type list real; The solver found a (partial) counterexample
+
+
+// But solving the problem with subtyping does not help?..
 
 val some_vec : vector real 10
 let some_vec = let v = [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000054R] in assert_norm (length v = 10); v
 
 val vec_dist:  xs: vector real 10 -> Tot bool
 let vec_dist  xs =  test_dist #10  xs some_vec epsilon
+
+// The below fail, rather mysteriously: (Error) assertion failed; The solver found a (partial) counterexample,..
 
 //let _ = assert(test_dist #10 some_vec some_vec 10.0R)
 
