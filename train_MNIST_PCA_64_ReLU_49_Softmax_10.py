@@ -50,23 +50,12 @@ ideal_inds = np.array([*ideal.values()]).flatten().tolist()
 #             label=train_labels[ind], ind=ind))
 #         plt.show()
 
-# TODO 1/2: Save this in your preferred format ..
 train_ideal = train_images[ideal_inds]
 
-file = open('data/ideal_train.txt', 'w')
 for i in range(train_ideal.shape[0]):
-    file.write(convert.convert_raw_vector(train_ideal[0]) + '\n')
-file.close()
-
-# np.save('models/train_ideal.npy', train_ideal.reshape((-1, 784)))
-# np.savetxt('models/train_ideal.txt', train_ideal.reshape((-1, 784)), delimiter= '')
-# pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.pickle', 'wb'))
-# pkl.dump(train_ideal.reshape((-1, 784)), open('models/train_ideal.xml', 'wb'))
-
-# train_ideal = np.load('models/train_ideal.npy')
-# train_ideal = np.loadtxt('models/train_ideal.txt')
-# with open('models/train_ideal.pickle', 'rb') as file:
-#     train_ideal = pkl.load(file)
+    file = open('data/ideal_train_{label}.txt'.format(label=i), 'w')
+    file.write(convert.convert_raw_vector(train_ideal[i]) + '\n')
+    file.close()
 
 # Reduce dimensionality
 pca = PCA(n_components=64)
@@ -74,24 +63,15 @@ train_images = pca.fit_transform(
     train_images.reshape((-1, 784))).reshape((-1, 64))
 test_images = pca.transform(test_images.reshape((-1, 784))).reshape((-1, 64))
 
-
-# TODO 2/2: ... and save this in your preferred format:
 train_ideal = train_images[ideal_inds]
 
-file = open('data/ideal_train_pca.txt', 'w')
 for i in range(train_ideal.shape[0]):
-    file.write(convert.convert_raw_vector(train_ideal[0]) + '\n')
-file.close()
-
-# np.save('models/train_ideal_pca.npy', train_ideal.reshape((-1, 64)))
-# np.savetxt('models/train_ideal_pca.txt', train_ideal.reshape((-1, 64)), delimiter= '')
-# pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.pickle', 'wb'))
-# pkl.dump(train_ideal.reshape((-1, 64)), open('models/train_ideal_pca.xml', 'wb'))
-
+    file = open('data/ideal_train_pca_{label}.txt'.format(label=i), 'w')
+    file.write(convert.convert_raw_vector(train_ideal[i]) + '\n')
+    file.close()
 
 # Train network
 model = keras.Sequential([
-    # keras.layers.Flatten(input_shape=(8, 8)),
     keras.layers.Dense(49, activation='relu'),
     keras.layers.Dense(10, activation='softmax')
 ])
@@ -118,5 +98,5 @@ test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
 model.summary()
 
-# model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
+model.save('models/MNIST_PCA_64_ReLU_49_Softmax_10.h5')
 
