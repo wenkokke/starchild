@@ -15,8 +15,7 @@ def convert_raw_vector(vector):
     values. """
     vals = ', '.join([convert.convert_real(i) for i in vector.flatten()])
     vals_ls = ('[' + vals + ']')
-    return vals_ls.replace("'", "")
+    return vals_ls.replace("'", "").replace(",", ";")
 
 print(convert.convert_vector(vector))
 print(convert_raw_vector(vector))
-
