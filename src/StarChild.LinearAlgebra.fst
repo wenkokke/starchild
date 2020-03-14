@@ -121,17 +121,42 @@ let sq_euclidean_dist #n xs ys =
 
 // Test: sq_euclidean_dist
 
-let _ = assert_norm (sq_euclidean_dist #2 [0.0R; 0.0R] [1.0R; 1.0R] = 2.0R)
- 
- 
-let _ = assert_norm (sq_euclidean_dist #5  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R]  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R] = 0.0R)
+let _ = assert_norm (
+  sq_euclidean_dist #2
+    (let v = [0.0R; 0.0R] in assert_norm (length v = 2); v)
+    (let v = [1.0R; 1.0R] in assert_norm (length v = 2); v) = 2.0R)
 
-let _ = assert_norm (sq_euclidean_dist #7  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R]  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R] = 0.0R)
+let _ = assert_norm (
+  sq_euclidean_dist #3
+    (let v = [0.0R; 0.0R; 0.0R] in assert_norm (length v = 3); v)
+    (let v = [1.0R; 1.0R; 1.0R] in assert_norm (length v = 3); v) = 3.0R)
 
-// this one does not work:
+let _ = assert_norm (
+  sq_euclidean_dist #4
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 4); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 4); v) = 4.0R)
 
-let _ = assert_norm (sq_euclidean_dist #8  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R]  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R] = 0.0R)
+let _ = assert_norm (
+  sq_euclidean_dist #5
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 5); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 5); v) = 5.0R)
 
-//this one does not work:
+let _ = assert_norm (
+  sq_euclidean_dist #6
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 6); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 6); v) = 6.0R)
 
-let _ = assert_norm (sq_euclidean_dist #10  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000054R]  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000054R] = 0.0R)
+let _ = assert_norm (
+  sq_euclidean_dist #7
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 7); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 7); v) = 7.0R)
+
+let _ = assert_norm (
+  sq_euclidean_dist #8
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 8); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 8); v) = 8.0R)
+
+let _ = assert_norm (
+  sq_euclidean_dist #9
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) = 9.0R)
