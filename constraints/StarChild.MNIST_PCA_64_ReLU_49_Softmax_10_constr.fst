@@ -251,23 +251,41 @@ let layer_2 =
 val model : network 64 10 2
 let model = NStep layer_1 (NLast layer_2)
 
-//we verify that, given an ideal input, this network is within squared euclidean distance of 100 from the ideal output.
-// We are given an ideal input and ideal output for classification into class "0" in MNIST data set, for the neural network of this architecture.
+
+// Verification properties:
+
+// Given ideal input and output vectors, we can have existential and universal verification properties.
+
+// Ideal input: number 0 from MNIST, reduced to 64 pixels by PCA:
+
+
+val ideal_in: vector real 64
+let ideal_in =    (let v =   [7.39413422R; ~.0.45122283R; ~.0.99287840R; 0.12975678R; ~.2.14545756R; 2.50539780R; 3.38043591R; ~.0.55560440R; 1.51105801R; 1.03224182R; ~.0.48750764R; ~.0.25086487R; 0.54150419R; ~.0.54645499R; ~.0.76339634R; ~.0.48698009R; 0.81663042R; 0.08385667R; ~.0.31908154R; ~.0.90446299R; ~.0.88148671R; ~.0.52867731R; ~.0.21378864R; ~.0.57753618R; 0.19284498R; 0.37615169R; 0.35952715R; 0.20249834R; 0.00596218R; 0.11063760R; ~.0.06929044R; 0.21801373R; ~.0.43784523R; ~.0.19706661R; 0.01978935R; 0.22892092R; 0.05789448R; ~.0.55008233R; 0.08943766R; ~.0.61843283R; 0.78263949R; ~.0.49890821R; 0.21547616R; ~.0.45667317R; ~.0.20145379R; 0.09385467R; 0.21886795R; ~.0.19465836R; ~.0.38395486R; 0.52597810R; 0.03076889R; 0.13726878R; 0.68338230R; 0.06083939R; 0.15436524R; ~.0.42471988R; ~.0.04722583R; 0.14616228R; 0.12828460R; 0.44898452R; 0.24222776R; 0.08422965R; ~.0.11814502R; ~.0.22121726R] in assert_norm (length v = 64); v)
+
+// Ideal output number 0 : 
 
 // Note: output of this network is probability distribution over 10 classes of MNIST data set. 
-
-// Ideal output: 
 
 val ideal_out: vector real 10
 let ideal_out =    (let v =  [0.99999940R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000000R; 0.00000002R; 0.00000000R; 0.00000054R] in assert_norm (length v = 10); v)
 
+// 
+
+// 1. Existential Verification condition:
+
+//we verify that, given an ideal input, this network is within squared euclidean distance of e.g. 100 from the ideal output.
+
+
 // Output of this network given the ideal input:
 
-val out: vector real 10
-let out = run_network model (let v =  [7.39413422R; ~.0.45122283R; ~.0.99287840R; 0.12975678R; ~.2.14545756R; 2.50539780R; 3.38043591R; ~.0.55560440R; 1.51105801R; 1.03224182R; ~.0.48750764R; ~.0.25086487R; 0.54150419R; ~.0.54645499R; ~.0.76339634R; ~.0.48698009R; 0.81663042R; 0.08385667R; ~.0.31908154R; ~.0.90446299R; ~.0.88148671R; ~.0.52867731R; ~.0.21378864R; ~.0.57753618R; 0.19284498R; 0.37615169R; 0.35952715R; 0.20249834R; 0.00596218R; 0.11063760R; ~.0.06929044R; 0.21801373R; ~.0.43784523R; ~.0.19706661R; 0.01978935R; 0.22892092R; 0.05789448R; ~.0.55008233R; 0.08943766R; ~.0.61843283R; 0.78263949R; ~.0.49890821R; 0.21547616R; ~.0.45667317R; ~.0.20145379R; 0.09385467R; 0.21886795R; ~.0.19465836R; ~.0.38395486R; 0.52597810R; 0.03076889R; 0.13726878R; 0.68338230R; 0.06083939R; 0.15436524R; ~.0.42471988R; ~.0.04722583R; 0.14616228R; 0.12828460R; 0.44898452R; 0.24222776R; 0.08422965R; ~.0.11814502R; ~.0.22121726R] in assert_norm (length v = 64); v)
+val out_from_ideal: vector real 10
+let out_from_ideal = run_network model ideal_in
 
 // Checking the squared Euclidean distance between these two outputs:
 
-let _ = assert_norm ( (sq_euclidean_dist #10  ideal_out  out) <. 100.0R)
+let _ = assert_norm ( (sq_euclidean_dist #10  ideal_out  out_from_ideal) <. 100.0R)
 
-// This latter assertion does not terminate...
+// 2. Universal verification condition:
+//for all vectors within certain distance from the ideal input, the network output will be close to ideal output  
+
+let _ = assert_norm ( forall (x: vector real 64). ((sq_euclidean_dist #64  ideal_in  x) <. 0.1R) ==>  (sq_euclidean_dist #10  ideal_out (run_network model x)) <. 100.0R)

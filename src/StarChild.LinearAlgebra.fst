@@ -159,4 +159,5 @@ let _ = assert_norm (
 let _ = assert_norm (
   sq_euclidean_dist #9
     (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
-    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) = 9.0R)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) <. 10.0R)
+
