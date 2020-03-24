@@ -65,13 +65,13 @@ vector_to_txt(
     vector=model.predict(train_images[ideal['0']].reshape((1, -1))).flatten(), 
     name='zero_pca_pred')
 
-# model.save('models/MNIST_PCA_25_ReLU_10_Softmax_10.h5')
+model.save('models/MNIST_PCA_25_ReLU_10_Softmax_10.h5')
 
 ideal = {label: (ideal_in,
                   model.predict(np.array([ideal_in]))[0])
           for label, index in ideal.items()
           for ideal_in in [train_images[index]]}
 
-with open('models/MNIST_PCA_64_ReLU_49_Softmax_10.ideal.pkl', 'wb') as fp:
+with open('models/MNIST_PCA_25_ReLU_10_Softmax_10.ideal.pkl', 'wb') as fp:
     pkl.dump(ideal, fp)
 
