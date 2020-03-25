@@ -127,6 +127,7 @@ let distance =  sq_euclidean_dist #10  ideal_out out_from_ideal
 
 val ver: x:vector real 25{(sq_euclidean_dist #25  ideal_in  x) <. 0.01R} -> 
 Lemma ( (sq_euclidean_dist #10  ideal_out (run_network model x)) <. 100.0R)
+let ver x = ()
 
 //let _ = assert_norm ( distance <. 100.0R)
 
