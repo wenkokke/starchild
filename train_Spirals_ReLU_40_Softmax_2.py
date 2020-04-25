@@ -13,10 +13,10 @@ import convert
 
     
 # Load spirals, spirals are approx. 0.5*pi awy from each other
-# x_data = np.load(file='D:/Github/starchild/x_data_7.5.npy')
-# y_data = np.load(file='D:/Github/starchild/y_data_7.5.npy')
-x_data = np.load(file='x_data_7.5.npy')
-y_data = np.load(file='y_data_7.5.npy')
+x_data = np.load(file='spiral_datasets/x_data_7.5.npy')
+y_data = np.load(file='spiral_datasets/y_data_7.5.npy')
+# x_data = np.load(file='spiral_datasets/x_data_9.0.npy')
+# y_data = np.load(file='spiral_datasets/y_data_9.0.npy')
 
 x_train, x_test, y_train, y_test = train_test_split(
     x_data, y_data, test_size=0.33)
