@@ -13,10 +13,10 @@ import convert
 
     
 # Load spirals, spirals are approx. 0.5*pi awy from each other
-x_data = np.load(file='spiral_datasets/x_data_7.5.npy')
-y_data = np.load(file='spiral_datasets/y_data_7.5.npy')
-# x_data = np.load(file='spiral_datasets/x_data_9.0.npy')
-# y_data = np.load(file='spiral_datasets/y_data_9.0.npy')
+# x_data = np.load(file='spiral_datasets/x_data_7.5.npy')
+# y_data = np.load(file='spiral_datasets/y_data_7.5.npy')
+x_data = np.load(file='spiral_datasets/x_data_9.0.npy')
+y_data = np.load(file='spiral_datasets/y_data_9.0.npy')
 
 x_train, x_test, y_train, y_test = train_test_split(
     x_data, y_data, test_size=0.33)
@@ -24,6 +24,7 @@ x_train, x_test, y_train, y_test = train_test_split(
 # Train network
 model = keras.Sequential([
     keras.layers.Dense(40, activation='relu', input_shape=(2,)),
+    keras.layers.Dense(40, activation='relu'),
     keras.layers.Dense(10, activation='softmax')
 ])
 
