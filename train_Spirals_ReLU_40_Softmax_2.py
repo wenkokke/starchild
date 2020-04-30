@@ -48,8 +48,8 @@ sample_label = y_train[rand_ind]
 print('sample: ', sample)
 print('sample_label: ', sample_label)
 
-pred = model.predict(sample)
-print('pred: ', pred)
+sample_pred = model.predict(sample)
+print('sample_pred: ', sample_pred)
 _, acc = model.evaluate(sample, sample_label, verbose=2)
 
 model.save('models/Spirals_ReLU_40_Softmax_10.h5')
