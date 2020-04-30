@@ -52,5 +52,5 @@ pred = model.predict(sample)
 print('pred: ', pred)
 _, acc = model.evaluate(sample, sample_label, verbose=2)
 
-# model.save('models/Spirals_ReLU_40_Softmax_10.h5')
+model.save('models/Spirals_ReLU_40_Softmax_10.h5')
 
