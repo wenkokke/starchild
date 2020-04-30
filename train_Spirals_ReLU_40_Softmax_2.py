@@ -1,6 +1,4 @@
 
-
-
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -20,6 +18,15 @@ y_data = np.load(file='spiral_datasets/y_data_9.0.npy')
 
 x_train, x_test, y_train, y_test = train_test_split(
     x_data, y_data, test_size=0.33)
+
+
+# TODO: Sampleofor testing:
+rand_ind = np.random.randint(0, x_train.shape[0], 1)
+sample = x_train[rand_ind]
+sample_label = y_train[rand_ind]
+print('sample: ', sample)
+print('sample_label: ', sample_label)
+
 
 # Train network
 model = keras.Sequential([
@@ -44,5 +51,5 @@ print('Train accuracy:', train_acc)
 print('Test accuracy:', test_acc)
 
 
-model.save('models/Spirals_ReLU_40_Softmax_10.h5')
+# model.save('models/Spirals_ReLU_40_Softmax_10.h5')
 
