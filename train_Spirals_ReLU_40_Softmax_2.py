@@ -14,25 +14,16 @@ import convert
 # x_data = np.load(file='spiral_datasets/x_data_7.5.npy')
 # y_data = np.load(file='spiral_datasets/y_data_7.5.npy')
 x_data = np.load(file='spiral_datasets/x_data_9.0.npy')
-y_data = np.load(file='spiral_datasets/y_data_9.0.npy')
+y_data = np.load(file='spiral_datasets/y_data_9.0.npy').astype(int)
 
 x_train, x_test, y_train, y_test = train_test_split(
     x_data, y_data, test_size=0.33)
-
-
-# TODO: Sampleofor testing:
-rand_ind = np.random.randint(0, x_train.shape[0], 1)
-sample = x_train[rand_ind]
-sample_label = y_train[rand_ind]
-print('sample: ', sample)
-print('sample_label: ', sample_label)
-
 
 # Train network
 model = keras.Sequential([
     keras.layers.Dense(40, activation='relu', input_shape=(2,)),
     keras.layers.Dense(40, activation='relu'),
-    keras.layers.Dense(10, activation='softmax')
+    keras.layers.Dense(2, activation='softmax')
 ])
 
 model.compile(
@@ -50,6 +41,16 @@ model.summary()
 print('Train accuracy:', train_acc)
 print('Test accuracy:', test_acc)
 
+# TODO: Sample for testing:
+rand_ind = np.random.randint(0, x_train.shape[0], 1)
+sample = x_train[rand_ind]
+sample_label = y_train[rand_ind]
+print('sample: ', sample)
+print('sample_label: ', sample_label)
+
+pred = model.predict(sample)
+print('pred: ', pred)
+_, acc = model.evaluate(sample, sample_label, verbose=2)
 
 # model.save('models/Spirals_ReLU_40_Softmax_10.h5')
 
