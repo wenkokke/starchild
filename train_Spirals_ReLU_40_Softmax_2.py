@@ -38,8 +38,8 @@ train_loss, train_acc = model.evaluate(x_train, y_train, verbose=2)
 test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
 
 model.summary()
-print('Train accuracy:', train_acc)
-print('Test accuracy:', test_acc)
+print('-> Train accuracy:', train_acc)
+print('-> Test accuracy:', test_acc)
 
 # TODO: Sample for testing:
 rand_ind = np.random.randint(0, x_train.shape[0], 1)
