@@ -21,8 +21,8 @@ x_train, x_test, y_train, y_test = train_test_split(
 
 # Train network
 model = keras.Sequential([
-    keras.layers.Dense(40, activation='relu', input_shape=(2,)),
-    keras.layers.Dense(40, activation='relu'),
+    keras.layers.Dense(10, activation='relu', input_shape=(2,)),
+    keras.layers.Dense(10, activation='relu'),
     keras.layers.Dense(2, activation='softmax')
 ])
 
