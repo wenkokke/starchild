@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -7,17 +6,12 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
-import convert
-
-    
-# Load spirals, spirals are approx. 0.5*pi awy from each other
-# x_data = np.load(file='spiral_datasets/x_data_7.5.npy')
-# y_data = np.load(file='spiral_datasets/y_data_7.5.npy')
+# Load data
 x_data = np.load(file='spiral_datasets/x_data_9.0.npy')
 y_data = np.load(file='spiral_datasets/y_data_9.0.npy').astype(int)
 
-x_train, x_test, y_train, y_test = train_test_split(
-    x_data, y_data, test_size=0.33)
+x_train, x_test, y_train, y_test = \
+    train_test_split(x_data, y_data, test_size=0.33)
 
 # Train network
 model = keras.Sequential([
@@ -41,16 +35,4 @@ model.summary()
 print('-> Train accuracy:', train_acc)
 print('-> Test accuracy:', test_acc)
 
-# TODO: Sample for testing:
-rand_ind = np.random.randint(0, x_train.shape[0], 1)
-sample = x_train[rand_ind]
-sample_label = y_train[rand_ind]
-print('sample: ', sample)
-print('sample_label: ', sample_label)
-
-sample_pred = model.predict(sample)
-print('sample_pred: ', sample_pred)
-_, acc = model.evaluate(sample, sample_label, verbose=2)
-
-model.save('models/Spirals_ReLU_40_Softmax_10.h5')
-
+model.save('models/Spirals_2_ReLU_10_ReLU_10_Softmax_2.h5')
