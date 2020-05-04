@@ -127,6 +127,7 @@ def convert_model(model_file, fstar_file, ideal_file=None):
 
         # Print model definition
         os.write(convert_layer_list(layers, n_in, n_out))
+        os.write('\n\n')
 
         # Print ideal inputs
         if not (ideal_file is None):
