@@ -4,13 +4,19 @@ open FStar.Real
 open StarChild.LinearAlgebra
 open StarChild.Network
 
-val layer1 : layer 2 1
-let layer1 = { weights    = [[228300.0R /. 13.0R]; [228300.0R /. 13.0R]]
-             ; biases     = [~.337910.0R /. 13.0R]
+val n : int
+let n = 2
+
+val t : real
+let t = 1000000000.0R
+
+val layer1 : layer n 1
+let layer1 = { weights    = replicate #(vector real 1) #n [t /. of_int n]
+             ; biases     = [~.(t -. (t /. (2.0R *. of_int n)))]
              ; activation = Sigmoid
              }
 
-val model : network 2 1 1
+val model : network n 1 1
 let model = NLast layer1
 
 let _ = assert(run_network model [1.0R; 1.0R] == [1.0R])

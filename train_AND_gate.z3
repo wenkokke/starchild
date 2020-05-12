@@ -1,5 +1,5 @@
 ;; Truthiness and falsiness
-(define-const epsilon Real 0.24)
+(define-const epsilon Real 0.249)
 (define-const true Real 1.0)
 (define-const false Real 0.0)
 (define-fun btwn ((l Real) (x Real) (u Real)) Bool (and (<= l x) (<= x u)))
