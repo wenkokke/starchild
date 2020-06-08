@@ -81,3 +81,89 @@ $(foreach bm,$(BENCHMARKS_H5_TL),$(eval $(call BENCHMARK_H5_template,$(bm))))
 
 bench/%.fst: bench/%.h5
 	python3 convert.py -i $< -o $@
+
+FSTAR_LIB=/Users/wen/.opam/4.05.0/lib/fstar
+
+%.checked: %
+	fstar.exe --include $(dir $<) --cache_checked_modules $<
+
+cache:\
+  cache-fstar-lib\
+	src/StarChild.LinearAlgebra.fst.checked\
+	src/StarChild.Network.fst.checked
+
+cache-fstar-lib:\
+	$(FSTAR_LIB)/FStar.Real.fsti.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.Native.fst.checked\
+	$(FSTAR_LIB)/FStar.Mul.fst.checked\
+	$(FSTAR_LIB)/FStar.List.Tot.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.Squash.fst.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked\
+	$(FSTAR_LIB)/FStar.Squash.fsti.checked
+
+$(FSTAR_LIB)/FStar.Real.fsti.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.FunctionalExtensionality.fst.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked\
+	$(FSTAR_LIB)/FStar.FunctionalExtensionality.fsti.checked
+
+$(FSTAR_LIB)/FStar.Classical.fst.checked:\
+	$(FSTAR_LIB)/FStar.Squash.fsti.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked\
+	$(FSTAR_LIB)/FStar.Classical.fsti.checked
+
+$(FSTAR_LIB)/FStar.Mul.fst.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.StrongExcludedMiddle.fst.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.Squash.fsti.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.List.Tot.Base.fst.checked:\
+	$(FSTAR_LIB)/FStar.Classical.fsti.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.Native.fst.checked\
+	$(FSTAR_LIB)/FStar.FunctionalExtensionality.fsti.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.List.Tot.Properties.fst.checked:\
+	$(FSTAR_LIB)/FStar.Classical.fsti.checked\
+	$(FSTAR_LIB)/FStar.StrongExcludedMiddle.fst.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.Native.fst.checked\
+	$(FSTAR_LIB)/FStar.List.Tot.Base.fst.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.Classical.fsti.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.Pervasives.fst.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.Native.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.FunctionalExtensionality.fsti.checked:\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.List.Tot.fst.checked:\
+	$(FSTAR_LIB)/FStar.List.Tot.Properties.fst.checked\
+	$(FSTAR_LIB)/FStar.List.Tot.Base.fst.checked\
+	$(FSTAR_LIB)/FStar.Pervasives.fst.checked\
+	$(FSTAR_LIB)/prims.fst.checked
+
+$(FSTAR_LIB)/FStar.Pervasives.Native.fst.checked:\
+	$(FSTAR_LIB)/prims.fst.checked
