@@ -110,7 +110,7 @@ let ( <* ) = mXv
 //Distances
 
 
-// 1. Square Eucledian distance : (d([x;y], (z;w))^2 = (x-z)^2 + (y-w)^2
+// 1. Square Eucledian distance (defined for L2-norm) : (d([x;y], [z;w])^2 = (x-z)^2 + (y-w)^2
 
 val sq : real -> Tot real_nat
 let sq x = x *. x
@@ -160,4 +160,109 @@ let _ = assert_norm (
   sq_euclidean_dist #9
     (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
     (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) <. 10.0R)
+
+// 2. Absolute distance (also known as Manhattan distance, defined for L1-norm): (d([x;y], [z;w]) = |x-z| + |y-w|)
+
+val abs : real -> Tot real
+let abs x = if x <. 0.0R then 0.0R -. x else x 
+
+val abs_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real
+let abs_dist #n xs ys =
+  sum #n (map2 #real #real #real #n (fun x y -> abs (x -. y)) xs ys)
+
+// Test: abs_dist
+
+let _ = assert_norm (
+  abs_dist #2
+    (let v = [0.0R; 0.0R] in assert_norm (length v = 2); v)
+    (let v = [1.0R; 1.0R] in assert_norm (length v = 2); v) = 2.0R)
+
+let _ = assert_norm (
+  abs_dist #3
+    (let v = [0.0R; 0.0R; 0.0R] in assert_norm (length v = 3); v)
+    (let v = [1.0R; 1.0R; 1.0R] in assert_norm (length v = 3); v) = 3.0R)
+
+let _ = assert_norm (
+  abs_dist #4
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 4); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 4); v) = 4.0R)
+
+let _ = assert_norm (
+  abs_dist #5
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 5); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 5); v) = 5.0R)
+
+let _ = assert_norm (
+  abs_dist #6
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 6); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 6); v) = 6.0R)
+
+let _ = assert_norm (
+  abs_dist #7
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 7); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 7); v) = 7.0R)
+
+let _ = assert_norm (
+  abs_dist #8
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 8); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 8); v) = 8.0R)
+
+let _ = assert_norm (
+  abs_dist #9
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) <. 10.0R)
+
+// 3. Worst-error distance (also known as Chebyshev distance, defined for L_{infinty}-norm): (d([x;y], [z;w]) = max (|x-z| , |y-w|)
+
+val maxR : real -> real -> Tot real
+let maxR i1 i2 = if i1 >. i2 then i1 else i2
+
+val max_pos : #n:nat -> xs:vector real n -> real
+let max_pos #n xs = fold_right (fun x y -> maxR x y) xs 0.0R
+
+val worst_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real
+let worst_dist #n xs ys =
+  max_pos #n (map2 #real #real #real #n (fun x y -> abs (x -. y)) xs ys)
+
+// Test: worst_dist
+
+let _ = assert_norm (
+  worst_dist #2
+    (let v = [0.0R; 0.0R] in assert_norm (length v = 2); v)
+    (let v = [1.0R; 5.0R] in assert_norm (length v = 2); v) = 5.0R)
+
+let _ = assert_norm (
+  worst_dist #3
+    (let v = [0.0R; 0.0R; 0.0R] in assert_norm (length v = 3); v)
+    (let v = [1.0R; 1.0R; 5.0R] in assert_norm (length v = 3); v) = 5.0R)
+
+let _ = assert_norm (
+  worst_dist #4
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 4); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 4); v) = 1.0R)
+
+let _ = assert_norm (
+  worst_dist #5
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 5); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 5); v) = 1.0R)
+
+let _ = assert_norm (
+  worst_dist #6
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 6); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 6); v) = 1.0R)
+
+let _ = assert_norm (
+  worst_dist #7
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 7); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 7); v) = 1.0R)
+
+let _ = assert_norm (
+  worst_dist #8
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 8); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 8); v) = 1.0R)
+
+let _ = assert_norm (
+  worst_dist #9
+    (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
+    (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) = 1.0R)
 
