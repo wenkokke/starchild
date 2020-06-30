@@ -82,7 +82,7 @@ $(foreach bm,$(BENCHMARKS_H5_TL),$(eval $(call BENCHMARK_H5_template,$(bm))))
 bench/%.fst: bench/%.h5
 	python3 convert.py -i $< -o $@
 
-FSTAR_LIB=/Users/wen/.opam/4.05.0/lib/fstar
+FSTAR_LIB=/Users/wen/.opam/fstar/lib/fstar
 
 %.checked: %
 	fstar.exe --include $(dir $<) --cache_checked_modules $<

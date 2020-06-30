@@ -7,7 +7,7 @@ def and_gate(n, total, model_precision, epsilon_precision):
     return '\n'.join([
         'module AND_Gate_{n}_Sigmoid_1'.format(n=n),
         '',
-        '#reset-options "--max_fuel {fuel} --z3rlimit {rlimit}"'.format(fuel=n+1, rlimit=500),
+        '#reset-options "--max_fuel {fuel} --z3rlimit {rlimit}"'.format(fuel=0, rlimit=500),
         '',
         'open FStar.Real',
         'open StarChild.LinearAlgebra',
@@ -48,7 +48,7 @@ def and_gate_correctness(n):
 
 def and_gate_correctness_constraint(inputs):
     """Generate F* a correctness constraint for an n-ary AND Gate."""
-    return 'let _ = assert(run_network model {inputs} == [{output}])\n'.format(
+    return 'let _ = assert_norm(run_network model {inputs} == [{output}])\n'.format(
         inputs=convert_vector(list(map(float, inputs)), precision=1),
         output=convert_real(float(all(inputs)), precision=1)
     )
@@ -122,13 +122,9 @@ def indent_by(n, lines):
 
 def assert_length(vals, n_vals):
     """Pretty-print an assertion stating `vals` has length `n_vals`."""
-    if n_vals > 2:
-        return '(let v = {vals} in assert_norm (length v = {n_vals}); v)'.format(
-            vals=indent_by(9,vals),
-            n_vals=n_vals
-        )
-    else:
-        return vals
+    return '(let v = {vals} in assert_norm (length v = {n_vals}); v)'.format(
+        vals=indent_by(9,vals),
+        n_vals=n_vals)
 
 if __name__ == "__main__":
     filename_tpl = 'benchmarks/AND_Gate_{n}_Sigmoid_1.fst'

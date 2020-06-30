@@ -7,8 +7,30 @@ open FStar.Mul
 
 type real_nat = x:real {x >=. 0.0R}
 type real_pos = x:real {x >. 0.0R}
+
 type vector 'a n = v:list 'a {length v == n}
 type matrix 'a r c = vector (vector 'a c) r
+
+val ( ~. ) : real -> Tot real
+let ( ~. ) x = 0.0R -. x
+
+val max : real -> real -> Tot real
+let max x y = if x >=. y then x else y
+
+val max_nat : real_nat -> real_nat -> Tot real_nat
+let max_nat x y = if x >=. y then x else y
+
+val min : real -> real -> Tot real
+let min x y = if x <=. y then x else y
+
+val min_nat : real_nat -> real_nat -> Tot real_nat
+let min_nat x y = if x <=. y then x else y
+
+val abs : real -> Tot real_nat
+let abs x = if x >=. 0.0R then x else ~. x
+
+val dist : real -> real -> Tot real
+let dist x y = abs (x -. y)
 
 val all : #a:Type -> #n:nat -> p:(a -> bool) -> xs:vector a n -> Tot bool
 let all #a #n p xs = fold_right (fun x y -> p x && y) xs true
@@ -161,14 +183,12 @@ let _ = assert_norm (
     (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
     (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) <. 10.0R)
 
-// 2. Absolute distance (also known as Manhattan distance, defined for L1-norm): (d([x;y], [z;w]) = |x-z| + |y-w|)
+// 2. Absolute distance (also known as Manhattan distance, defined for L1-norm):
+// (d([x;y], [z;w]) = |x-z| + |y-w|)
 
-val abs : real -> Tot real
-let abs x = if x <. 0.0R then 0.0R -. x else x 
-
-val abs_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real
+val abs_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real_nat
 let abs_dist #n xs ys =
-  sum #n (map2 #real #real #real #n (fun x y -> abs (x -. y)) xs ys)
+  sum_nat #n (map2 #real #real #real_nat #n (fun x y -> abs (x -. y)) xs ys)
 
 // Test: abs_dist
 
@@ -212,17 +232,12 @@ let _ = assert_norm (
     (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
     (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) <. 10.0R)
 
-// 3. Worst-error distance (also known as Chebyshev distance, defined for L_{infinty}-norm): (d([x;y], [z;w]) = max (|x-z| , |y-w|)
+// 3. Worst-error distance (also known as Chebyshev distance, defined for L_{infinty}-norm):
+// (d([x;y], [z;w]) = max (|x-z| , |y-w|)
 
-val maxR : real -> real -> Tot real
-let maxR i1 i2 = if i1 >. i2 then i1 else i2
-
-val max_pos : #n:nat -> xs:vector real n -> real
-let max_pos #n xs = fold_right (fun x y -> maxR x y) xs 0.0R
-
-val worst_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real
+val worst_dist : #n:nat -> xs:vector real n -> ys:vector real n -> Tot real_nat
 let worst_dist #n xs ys =
-  max_pos #n (map2 #real #real #real #n (fun x y -> abs (x -. y)) xs ys)
+  fold_right max_nat (map2 #real #real #real_nat #n (fun x y -> abs (x -. y)) xs ys) 0.0R
 
 // Test: worst_dist
 
@@ -265,4 +280,3 @@ let _ = assert_norm (
   worst_dist #9
     (let v = [0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R; 0.0R] in assert_norm (length v = 9); v)
     (let v = [1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R; 1.0R] in assert_norm (length v = 9); v) = 1.0R)
-
