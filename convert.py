@@ -53,7 +53,7 @@ def convert_ideal(ideal_label, ideal_in, ideal_out):
     """"""
     n_ideal_in=len(ideal_in)
     n_ideal_out=len(ideal_out)
-    return ('val ideal_{ideal_label}_in : {n_ideal_in}\n'
+    return ('val ideal_{ideal_label}_in : vector real {n_ideal_in}\n'
             'let ideal_{ideal_label}_in = {ideal_in}\n'
             '\n'
             'val ideal_{ideal_label}_out : {n_ideal_out}\n'
@@ -92,51 +92,70 @@ def convert_layer_list(layers, n_in, n_out):
             'let model = {layer_list}').format(
                 n_in=n_in, n_out=n_out, layer_list=layer_list, n_layers=len(layers))
 
-def convert_model(model_file, fstar_file, ideal_file=None):
+def convert_model(module_name, model, ideal):
+
+    # Print layer definitions
+    layer_defns = []
+    layer_names = []
+    n_in = None
+    n_out = None
+    for index, layer in enumerate(model.layers):
+        params = layer.get_weights()
+        if len(params) > 0:
+            weights = params[0]
+            rows = weights.shape[0]
+            cols = weights.shape[1]
+            layer_names.append('layer_{}'.format(index))
+            if n_in is None: n_in = rows
+            n_out = cols
+            layer_defns.append(convert_layer(index, layer))
+
+    # Print model definition
+    model_defn = convert_layer_list(layer_names, n_in, n_out)
+
+    # Print ideals
+    ideal_defns = []
+    for ideal_label, ideal_data in ideal.items():
+        ideal_in, ideal_out = ideal_data
+        ideal_defns.append(convert_ideal(ideal_label, ideal_in, ideal_out))
+
+    return ('module {module_name}\n'
+            '\n'
+            'open FStar.Real\n'
+            'open StarChild.LinearAlgebra\n'
+            'open StarChild.Network\n'
+            '\n'
+            '#reset-options "--max_fuel 0 --z3rlimit 500"\n'
+            '\n'
+            '{layer_defns}\n'
+            '\n'
+            '{model_defn}\n'
+            '\n'
+            '{ideal_defns}\n'
+    ).format(module_name=module_name,
+             layer_defns='\n\n'.join(layer_defns),
+             model_defn=model_defn,
+             ideal_defns='\n\n'.join(ideal_defns))
+
+
+def main(model_file, fstar_file, ideal_file=None):
     """Pretty-print a Keras models from a H5 file."""
 
     # Open output file
     with open(fstar_file, 'w') as os:
 
-        # Print file preamble
         module_name = Path(fstar_file).resolve().stem
-        os.write(('module {}\n'
-                  '\n'
-                  'open StarChild.LinearAlgebra\n'
-                  'open StarChild.Network\n'
-                  '\n').format(module_name))
-
-        # Load model
         model = load_model(model_file)
 
-        # Print layer definitions
-        layers = []
-        n_in = None
-        n_out = None
-        for index, layer in enumerate(model.layers):
-            params = layer.get_weights()
-            if len(params) > 0:
-                weights = params[0]
-                rows = weights.shape[0]
-                cols = weights.shape[1]
-                layers.append('layer_{}'.format(index))
-                if n_in is None: n_in = rows
-                n_out = cols
-                os.write(convert_layer(index, layer))
-                os.write('\n\n')
-
-        # Print model definition
-        os.write(convert_layer_list(layers, n_in, n_out))
-        os.write('\n\n')
-
-        # Print ideal inputs
-        if not (ideal_file is None):
+        if (ideal_file is None):
+            ideal = {}
+        else:
             with open(ideal_file, 'rb') as fp:
                 ideal = pkl.load(fp)
                 for ideal_label, ideal_data in ideal.items():
                     ideal_in, ideal_out = ideal_data
-                    os.write(convert_ideal(ideal_label, ideal_in, ideal_out))
-                    os.write('\n\n')
+
+        os.write(convert_model(module_name, model, ideal))
 
 def help():
     print('Usage: python convert.py [--with-ideal=[ideal_file]] -i [model_file] -o [fstar_file]')
@@ -158,7 +177,7 @@ if __name__ == "__main__":
     if Path(model_file).is_file():
         if not (ideal_file is None or Path(ideal_file).is_file()):
             print("Error: file '" + ideal_file + "' not found.")
-        convert_model(model_file, fstar_file, ideal_file=ideal_file)
+        main(model_file, fstar_file, ideal_file=ideal_file)
     elif ifile is None:
         help()
     else:

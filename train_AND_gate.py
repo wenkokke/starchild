@@ -1,5 +1,5 @@
 from functools import partial
-from itertools import product, repeat
+from itertools import chain, product, repeat
 import numpy as np
 
 def and_gate(n, total, model_precision, epsilon_precision):
@@ -128,6 +128,6 @@ def assert_length(vals, n_vals):
 
 if __name__ == "__main__":
     filename_tpl = 'benchmarks/AND_Gate_{n}_Sigmoid_1.fst'
-    for n in range(2,100):
+    for n in chain(range(2,100,1), range(100,1000,10), range(1000,10000,100)):
         with open(filename_tpl.format(n=n), 'w') as fp:
             fp.write(and_gate(n, total=1E9, model_precision=9, epsilon_precision=9))

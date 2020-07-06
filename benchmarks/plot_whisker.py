@@ -27,18 +27,20 @@ for path in args.paths:
         results = json.load(f)["results"]
 
     label = pathlib.Path(path).stem
-    parameters = [b["parameter"] for b in results]
+    parameters = [int(b["parameter"]) for b in results]
     medians = [b["median"] for b in results]
     stddevs = [b["stddev"] for b in results]
+
+    print(label, parameters, medians, stddevs)
 
     plt.errorbar (parameters, medians, stddevs, label=label)
 
 ax = plt.gca()
-ax.xaxis.set_major_locator(ticker.MultipleLocator(10))
+ax.xaxis.set_major_locator(ticker.MultipleLocator(50))
 ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
 
 plt.autoscale(enable=False, axis='x')
-plt.xlim(0,100)
+plt.xlim(0,300)
 plt.xlabel("Size [number of inputs]")
 plt.ylim(0,None)
 plt.ylabel("Time [s]")
